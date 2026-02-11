@@ -1,0 +1,1298 @@
+{
+  "info": {
+    "name": "User",
+    "description": null,
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Operational",
+      "item": [
+        {
+          "name": "Service Info",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Version",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/version",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/health",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Readiness Probe",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/readiness",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Liveness Probe",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/liveness",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Metrics",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/metrics",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        }
+      ],
+      "request": null
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update User Names",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update User Password",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Preferences",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        }
+      ],
+      "request": null
+    },
+    {
+      "name": "Address",
+      "item": [
+        {
+          "name": "Get All Addresses",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/addresses",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Add New Address",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/addresses",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Existing Address",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/addresses/685ea751af282ed31538d75f",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Existing Address Partial",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/addresses/685ea751af282ed31538d75f",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Delete Existing Address",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/addresses/685ea751af282ed31538d75f",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        }
+      ],
+      "request": null
+    },
+    {
+      "name": "Payment Methods",
+      "item": [
+        {
+          "name": "Get All Payment Methods",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/paymentmethods",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Add New Payment Method",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/paymentmethods",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Existing Payment Method",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/paymentmethods/685edc1b89a93c9ab558b194",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Existing Payment Method Partial",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/paymentmethods/685edc1b89a93c9ab558b194",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Delete Payment Method",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/paymentmethods/685edc1b89a93c9ab558b194",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Payment Methods (Batch)",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        }
+      ],
+      "request": null
+    },
+    {
+      "name": "Wishlist",
+      "item": [
+        {
+          "name": "Get All Wishlist",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/wishlist",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Add To Wishlist",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/wishlist",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Existing Wishlist",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/wishlist/685edd2489a93c9ab558b1ec",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Update Wishlist Partial",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/wishlist/685edd2489a93c9ab558b1ec",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        },
+        {
+          "name": "Delete From Wishlist",
+          "item": null,
+          "request": {
+            "auth": {
+              "type": null,
+              "apikey": null,
+              "awsv4": null,
+              "basic": null,
+              "bearer": null,
+              "digest": null,
+              "hawk": null,
+              "ntlm": null,
+              "oauth1": null,
+              "oauth2": null
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "dapr-app-id",
+                "value": "user-service",
+                "type": "Header",
+                "disabled": false
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml",
+                "type": "Header",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": null,
+              "raw": null,
+              "options": null,
+              "formdata": null,
+              "urlencoded": null,
+              "file": null
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{userPort}}/api/users/wishlist/685edd2489a93c9ab558b1ec",
+              "protocol": null,
+              "host": null,
+              "path": null,
+              "query": [],
+              "variable": null
+            }
+          }
+        }
+      ],
+      "request": null
+    }
+  ],
+  "variable": null,
+  "auth": null
+}

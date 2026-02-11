@@ -1,0 +1,1307 @@
+{
+    "info": {
+        "name": "Product",
+        "description": null,
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Operational",
+            "item": [
+                {
+                    "name": "Service Info",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Version",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/version",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Health Check",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/health",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Readiness Probe",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/readiness",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Liveness Probe",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/liveness",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Metrics",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/metrics",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                }
+            ],
+            "request": null
+        },
+        {
+            "name": "Products - Direct",
+            "item": [
+                {
+                    "name": "List All Products",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "List Products By Category",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products?category=Electronics",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "List Products By Price Range",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products?min_price=500&max_price=800",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Get Product By ID",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/685c5804e723259e3872f2bc",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Search Products",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            },
+                            {
+                                "key": "Cache-Control",
+                                "value": "no-cache",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/search?q=gadget",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Get Trending Products And Categories",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/trending?products_limit=4&categories_limit=5",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Create Product",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ],
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": "{\n  \"name\": \"iPhone 16 Pro\",\n  \"description\": \"Latest iPhone with advanced features\",\n  \"price\": 1299.99,\n  \"sku\": \"IPHONE-16-PRO\",\n  \"category\": \"Electronics\",\n  \"department\": \"Electronics\",\n  \"subcategory\": \"Mobile\",\n  \"images\": [\"https://example.com/iphone-16.jpg\"],\n  \"tags\": [\"smartphone\", \"ios\", \"premium\"]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Update Product",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ],
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": "{\n  \"name\": \"iPhone 15 Pro Max Updated\",\n  \"price\": 1199.99,\n  \"description\": \"Updated description with new features\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/685d2b9af1521832a9f0cd12",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Product",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ],
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/685d2b9af1521832a9f0cd12",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Reactivate Product",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ],
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/685d2b9af1521832a9f0cd12/reactivate",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                }
+            ],
+            "request": null
+        },
+        {
+            "name": "Products - Dapr",
+            "item": [
+                {
+                    "name": "List All Products (Dapr)",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "http://localhost:3501/v1.0/invoke/product-service/method/api/products",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Get Product By ID (Dapr)",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "http://localhost:3501/v1.0/invoke/product-service/method/api/products/685c5804e723259e3872f2bc",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Search Products (Dapr)",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "http://localhost:3501/v1.0/invoke/product-service/method/api/products/search?q=gadget",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Get Trending Products And Categories (Dapr)",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "http://localhost:3501/v1.0/invoke/product-service/method/api/products/trending?products_limit=4&categories_limit=5",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                }
+            ],
+            "request": null
+        },
+        {
+            "name": "Internal Endpoints",
+            "item": [
+                {
+                    "name": "Check Product Exists",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/internal/685c5804e723259e3872f2bc/exists",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Check Product Exists (Dapr)",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "http://localhost:3501/v1.0/invoke/product-service/method/api/products/internal/685c5804e723259e3872f2bc/exists",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                }
+            ],
+            "request": null
+        },
+        {
+            "name": "Import & Export",
+            "item": [
+                {
+                    "name": "Export Products As JSON",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ],
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/export?filetype=json",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Export Products As CSV",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ],
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/export?filetype=csv",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                }
+            ],
+            "request": null
+        },
+        {
+            "name": "Error Scenarios",
+            "item": [
+                {
+                    "name": "Get Product - Not Found",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/111c5804e723259e3872f2bc",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Get Product - Invalid ID",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/invalid-id",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "List Products - Non-Existent Category",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": null,
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": null,
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products?category=NonExistentCategory",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Product - Not Found",
+                    "item": null,
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "apikey": null,
+                            "awsv4": null,
+                            "basic": null,
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt}}",
+                                    "type": "string"
+                                }
+                            ],
+                            "digest": null,
+                            "hawk": null,
+                            "ntlm": null,
+                            "oauth1": null,
+                            "oauth2": null
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "dapr-app-id",
+                                "value": "product-service",
+                                "type": "Header",
+                                "disabled": false
+                            }
+                        ],
+                        "body": {
+                            "mode": null,
+                            "raw": null,
+                            "options": null,
+                            "formdata": null,
+                            "urlencoded": null,
+                            "file": null
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}:{{productPort}}/api/products/111c5ae96e956ffac75dde34",
+                            "protocol": null,
+                            "host": null,
+                            "path": null,
+                            "query": [],
+                            "variable": null
+                        }
+                    }
+                }
+            ],
+            "request": null
+        }
+    ],
+    "variable": null,
+    "auth": null
+}

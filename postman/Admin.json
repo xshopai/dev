@@ -1,0 +1,487 @@
+{
+	"info": {
+		"_postman_id": "968ebe66-4c48-4a7a-97f2-32900f09ddaf",
+		"name": "Admin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1811327"
+	},
+	"item": [
+		{
+			"name": "Operational",
+			"item": [
+				{
+					"name": "Service Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Version",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/version",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"version"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Readiness Probe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/health/ready",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"health",
+								"ready"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Liveness Probe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/health/live",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"health",
+								"live"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/metrics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"metrics"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/api/admin/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Id (Valid)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/api/admin/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6855ad429da079da73426065"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Id (Invalid)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/api/admin/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"updated.email@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/api/admin/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6859c9bd49fa695169361c81"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/api/admin/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "685e7bc78bc582bc246e56b4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isActive\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/api/admin/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6859c9bd49fa695169361c81"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "admin-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{adminPort}}/api/admin/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "685e98a1e8a55e1d80884e20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

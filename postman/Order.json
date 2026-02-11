@@ -1,0 +1,414 @@
+{
+	"info": {
+		"_postman_id": "d376f122-13d0-4d56-9186-59e4248a70bf",
+		"name": "Order",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1811327"
+	},
+	"item": [
+		{
+			"name": "Operational",
+			"item": [
+				{
+					"name": "Service Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Version",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/version",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"version"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Readiness Probe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/health/ready",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"health",
+								"ready"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Liveness Probe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/health/live",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"health",
+								"live"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/metrics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"metrics"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order Management",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerId\": 2,\n  \"orderDate\": \"2023-07-01\",\n  \"orderAmount\": 99.0,\n  \"orderLineItemModelList\": [\n    {\n      \"productId\": \"PROD-001\",\n      \"unitPrice\": 10.0,\n      \"quantity\": 2,\n      \"discount\": 0.0\n    },\n    {\n      \"productId\": \"PROD-002\",\n      \"unitPrice\": 90.0,\n      \"quantity\": 1,\n      \"discount\": 0.1\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders/myorders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders",
+								"myorders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order To Paid",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders/:id/pay",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders",
+								":id",
+								"pay"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order To Delivered",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders/:id/delivered",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders",
+								":id",
+								"delivered"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders/:id/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders",
+								":id",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Order",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "dapr-app-id",
+								"value": "order-service",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}:{{orderPort}}/api/orders/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"port": "{{orderPort}}",
+							"path": [
+								"api",
+								"orders",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "8ecfd8b6-e600-4498-b3e5-91e233c4a383"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

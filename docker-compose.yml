@@ -1,0 +1,269 @@
+# =============================================================================
+# xshopai - Local Development Infrastructure
+# =============================================================================
+# This file contains ALL infrastructure services needed for local development.
+# Run this BEFORE starting any application services.
+#
+# Quick Start:
+#   docker-compose up -d
+#   docker-compose down
+#   docker-compose down --volumes  # Remove all data
+#
+# Services included:
+#   - Message Broker (RabbitMQ)
+#   - Distributed Tracing (Zipkin)
+#   - Email Testing (Mailpit)
+#   - Cache & Session Store (Redis)
+#   - MongoDB (3 instances: user, product, review)
+#   - PostgreSQL (2 instances: audit, order-processor)
+#   - SQL Server (2 instances: order, payment)
+#   - MySQL (1 instance: inventory)
+#
+# Note: Auth service uses user-service database (no separate database)
+#       Cart service uses Redis (no separate database)
+
+version: "3.8"
+
+services:
+  # ============================================================================
+  # Message Broker
+  # ============================================================================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: dev-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - xshopai-dev
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # Distributed Tracing
+  # ============================================================================
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: dev-zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    environment:
+      JAVA_OPTS: -Xms512m -Xmx512m
+    networks:
+      - xshopai-dev
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9411/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================================
+  # Email Testing
+  # ============================================================================
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: dev-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - xshopai-dev
+
+  # ============================================================================  # Cache & Session Store
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: dev-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis_dev_pass_123
+    volumes:
+      - redis_data:/data
+    networks:
+      - xshopai-dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================================  # MongoDB Databases
+  # ============================================================================
+  user-mongodb:
+    image: mongo:latest
+    container_name: dev-user-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: user_service_db
+    volumes:
+      - user_mongodb_data:/data/db
+    networks:
+      - xshopai-dev
+
+  product-mongodb:
+    image: mongo:latest
+    container_name: dev-product-mongodb
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: product_service_db
+    volumes:
+      - product_mongodb_data:/data/db
+    networks:
+      - xshopai-dev
+
+  review-mongodb:
+    image: mongo:latest
+    container_name: dev-review-mongodb
+    restart: unless-stopped
+    ports:
+      - "27020:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: review_service_db
+    volumes:
+      - review_mongodb_data:/data/db
+    networks:
+      - xshopai-dev
+
+  # ============================================================================
+  # PostgreSQL Databases
+  # ============================================================================
+  audit-postgres:
+    image: postgres:16
+    container_name: dev-audit-postgres
+    restart: unless-stopped
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: audit_service_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    volumes:
+      - audit_postgres_data:/var/lib/postgresql/data
+    networks:
+      - xshopai-dev
+
+  order-processor-postgres:
+    image: postgres:16
+    container_name: dev-order-processor-postgres
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: order_processor_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - order_processor_postgres_data:/var/lib/postgresql/data
+    networks:
+      - xshopai-dev
+
+  # ============================================================================
+  # SQL Server Databases
+  # ============================================================================
+  order-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dev-order-sqlserver
+    restart: unless-stopped
+    ports:
+      - "1434:1433"
+    environment:
+      SA_PASSWORD: Admin123!
+      ACCEPT_EULA: Y
+      MSSQL_PID: Developer
+    volumes:
+      - order_sqlserver_data:/var/opt/mssql
+    networks:
+      - xshopai-dev
+
+  payment-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dev-payment-sqlserver
+    restart: unless-stopped
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: Admin123!
+      ACCEPT_EULA: Y
+      MSSQL_PID: Developer
+    volumes:
+      - payment_sqlserver_data:/var/opt/mssql
+    networks:
+      - xshopai-dev
+
+  # ============================================================================
+  # MySQL Database
+  # ============================================================================
+  inventory-mysql:
+    image: mysql:latest
+    container_name: dev-inventory-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: inventory_root_pass_123
+      MYSQL_DATABASE: inventory_service_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin123
+    volumes:
+      - inventory_mysql_data:/var/lib/mysql
+    networks:
+      - xshopai-dev
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  rabbitmq_data:
+    name: xshopai-dev-rabbitmq
+  redis_data:
+    name: xshopai-dev-redis
+  user_mongodb_data:
+    name: xshopai-dev-user-mongodb
+  product_mongodb_data:
+    name: xshopai-dev-product-mongodb
+  review_mongodb_data:
+    name: xshopai-dev-review-mongodb
+  audit_postgres_data:
+    name: xshopai-dev-audit-postgres
+  order_processor_postgres_data:
+    name: xshopai-dev-order-processor-postgres
+  order_sqlserver_data:
+    name: xshopai-dev-order-sqlserver
+  payment_sqlserver_data:
+    name: xshopai-dev-payment-sqlserver
+  inventory_mysql_data:
+    name: xshopai-dev-inventory-mysql
+
+# ============================================================================
+# Network
+# ============================================================================
+networks:
+  xshopai-dev:
+    name: xshopai-dev-network
+    driver: bridge
