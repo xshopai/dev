@@ -34,19 +34,19 @@ echo ""
 
 # Services to start (ordered by port number)
 declare -a SERVICES=(
+    "Auth Service:auth-service:8000"
     "Product Service:product-service:8001"
     "User Service:user-service:8002"
-    "Admin Service:admin-service:8003"
-    "Auth Service:auth-service:8004"
+    "Cart Service:cart-service:8008"
     "Inventory Service:inventory-service:8005"
     "Order Service:order-service:8006"
     "Order Processor:order-processor-service:8007"
-    "Cart Service:cart-service:8008"
+    "Review Service:review-service:8008"
     "Payment Service:payment-service:8009"
-    "Review Service:review-service:8010"
+    "Audit Service:audit-service:8010"
     "Notification Service:notification-service:8011"
-    "Audit Service:audit-service:8012"
-    "Chat Service:chat-service:8013"
+    "Chat Service:chat-service:8012"
+    "Admin Service:admin-service:8013"
     "Web BFF:web-bff:8014"
 )
 
