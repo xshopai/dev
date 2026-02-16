@@ -646,7 +646,7 @@ build_service() {
             fi
             
             log_debug "Compiling..."
-            if ! "$maven_cmd" clean compile 2>&1; then
+            if ! "$maven_cmd" compile 2>&1; then
                 log_error "maven compile failed"
                 build_error="maven compile failed"
                 cd "$SCRIPT_DIR"
