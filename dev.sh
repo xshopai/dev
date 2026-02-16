@@ -1,15 +1,14 @@
 #!/bin/bash
 # =============================================================================
-# xshopai - Run All Services Script (Local/No Dapr)
+# xshopai - Run All Services Script (Development with Dapr)
 # =============================================================================
 # This script starts all microservices, BFF, and UIs by launching their
-# individual local.sh scripts in separate terminal windows
+# individual dev.sh scripts in separate terminal windows
 #
-# WARNING: Services will run WITHOUT Dapr sidecars
-# - Event publishing will fail (logged but services continue)
-# - Service-to-service communication won't work
-# - Event consumption won't work
-# Use this for isolated development/testing only!
+# Each service's dev.sh script typically:
+# - Starts the Dapr sidecar
+# - Runs the service in development mode
+# - Enables event publishing and service-to-service communication
 
 set -e
 
@@ -28,7 +27,7 @@ GRAY='\033[0;37m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}xshopai - Starting All Services (Local)${NC}"
+echo -e "${BLUE}xshopai - Starting All Services${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
@@ -56,11 +55,8 @@ declare -a UIS=(
     "Admin UI:admin-ui:3001"
 )
 
-echo -e "${RED}⚠️  WARNING: Running WITHOUT Dapr${NC}"
-echo -e "${YELLOW}This mode is for isolated development only.${NC}"
-echo -e "${YELLOW}Event publishing, service-to-service calls, and event consumption will fail.${NC}"
-echo ""
 echo -e "${CYAN}This script will launch each service in a separate terminal window.${NC}"
+echo -e "${CYAN}Each service runs with its Dapr sidecar for full functionality.${NC}"
 echo ""
 echo -e "${GREEN}Press Enter to start all services...${NC}"
 read
@@ -84,28 +80,28 @@ esac
 for service_info in "${SERVICES[@]}"; do
     IFS=':' read -r name path port <<< "$service_info"
     SERVICE_PATH="$WORKSPACE_ROOT/$path"
-    RUN_SCRIPT="$SERVICE_PATH/scripts/local.sh"
+    RUN_SCRIPT="$SERVICE_PATH/scripts/dev.sh"
     
     if [ -f "$RUN_SCRIPT" ]; then
         echo -e "  ${GREEN}Starting $name...${NC}"
         
         if [ "$WINDOWS_BASH" = true ]; then
             # Windows - use mintty
-            mintty -t "$name (Local)" -e bash -l -c "cd '$SERVICE_PATH' && ./scripts/local.sh; exec bash" &
+            mintty -t "$name" -e bash -l -c "cd '$SERVICE_PATH' && ./scripts/dev.sh; exec bash" &
         elif [ "$OS_TYPE" = "Darwin" ]; then
             # macOS
-            osascript -e "tell app \"Terminal\" to do script \"cd '$SERVICE_PATH' && ./scripts/local.sh\"" &
+            osascript -e "tell app \"Terminal\" to do script \"cd '$SERVICE_PATH' && ./scripts/dev.sh\"" &
         else
             # Linux
             if command -v gnome-terminal &> /dev/null; then
-                gnome-terminal --title="$name (Local)" -- bash -c "cd '$SERVICE_PATH' && ./scripts/local.sh; exec bash" &
+                gnome-terminal --title="$name" -- bash -c "cd '$SERVICE_PATH' && ./scripts/dev.sh; exec bash" &
             elif command -v xterm &> /dev/null; then
-                xterm -T "$name (Local)" -e bash -c "cd '$SERVICE_PATH' && ./scripts/local.sh; exec bash" &
+                xterm -T "$name" -e bash -c "cd '$SERVICE_PATH' && ./scripts/dev.sh; exec bash" &
             fi
         fi
         sleep 0.3
     else
-        echo -e "  ${YELLOW}⚠ Skipping $name - scripts/local.sh not found${NC}"
+        echo -e "  ${YELLOW}⚠ Skipping $name - scripts/dev.sh not found${NC}"
     fi
 done
 
@@ -116,28 +112,28 @@ echo ""
 for ui_info in "${UIS[@]}"; do
     IFS=':' read -r name path port <<< "$ui_info"
     UI_PATH="$WORKSPACE_ROOT/$path"
-    RUN_SCRIPT="$UI_PATH/scripts/local.sh"
+    RUN_SCRIPT="$UI_PATH/scripts/dev.sh"
     
     if [ -f "$RUN_SCRIPT" ]; then
         echo -e "  ${GREEN}Starting $name...${NC}"
         
         if [ "$WINDOWS_BASH" = true ]; then
             # Windows - use mintty
-            mintty -t "$name (Local)" -e bash -l -c "cd '$UI_PATH' && ./scripts/local.sh; exec bash" &
+            mintty -t "$name" -e bash -l -c "cd '$UI_PATH' && ./scripts/dev.sh; exec bash" &
         elif [ "$OS_TYPE" = "Darwin" ]; then
             # macOS
-            osascript -e "tell app \"Terminal\" to do script \"cd '$UI_PATH' && ./scripts/local.sh\"" &
+            osascript -e "tell app \"Terminal\" to do script \"cd '$UI_PATH' && ./scripts/dev.sh\"" &
         else
             # Linux
             if command -v gnome-terminal &> /dev/null; then
-                gnome-terminal --title="$name (Local)" -- bash -c "cd '$UI_PATH' && ./scripts/local.sh; exec bash" &
+                gnome-terminal --title="$name" -- bash -c "cd '$UI_PATH' && ./scripts/dev.sh; exec bash" &
             elif command -v xterm &> /dev/null; then
-                xterm -T "$name (Local)" -e bash -c "cd '$UI_PATH' && ./scripts/local.sh; exec bash" &
+                xterm -T "$name" -e bash -c "cd '$UI_PATH' && ./scripts/dev.sh; exec bash" &
             fi
         fi
         sleep 0.3
     else
-        echo -e "  ${YELLOW}⚠ Skipping $name - scripts/local.sh not found${NC}"
+        echo -e "  ${YELLOW}⚠ Skipping $name - scripts/dev.sh not found${NC}"
     fi
 done
 
@@ -163,6 +159,6 @@ for service_info in "${SERVICES[@]}"; do
     fi
 done
 echo ""
-echo -e "${RED}⚠️  REMINDER: Running without Dapr - inter-service communication disabled${NC}"
+echo -e "${GREEN}All services started with Dapr sidecars.${NC}"
 echo -e "${YELLOW}To stop all services, close each terminal window.${NC}"
 echo ""
