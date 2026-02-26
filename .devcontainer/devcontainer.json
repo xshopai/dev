@@ -1,0 +1,165 @@
+{
+  "name": "xshopai Platform",
+
+  // Use both the infrastructure compose file and the devcontainer-specific one.
+  // Docker Compose merges them: all infra services + the 'app' devcontainer
+  // service are placed on the same xshopai-dev network so service processes
+  // running inside this container can reach every database/broker by name.
+  "dockerComposeFile": ["../docker-compose.yml", "docker-compose.devcontainer.yml"],
+  "service": "app",
+  "workspaceFolder": "/workspaces/dev",
+
+  // Request a large machine - running 14 services + all databases needs it.
+  // The user picks a machine >= these specs when creating the Codespace.
+  "hostRequirements": {
+    "cpus": 8,
+    "memory": "32gb",
+    "storage": "64gb"
+  },
+
+  // Clone all repos, install all dependencies, start infrastructure.
+  // Runs once after the container is first created.
+  "postCreateCommand": "bash /workspaces/dev/.devcontainer/setup.sh",
+
+  // Forward all service and infra UI ports so they are accessible
+  // from the developer's browser via the Codespace URL.
+  "forwardPorts": [
+    3000, 3001, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 5672, 15672, 9411,
+    8025, 6379
+  ],
+  "portsAttributes": {
+    "3000": { "label": "Customer UI", "onAutoForward": "notify" },
+    "3001": { "label": "Admin UI", "onAutoForward": "notify" },
+    "8001": { "label": "product-service", "onAutoForward": "silent" },
+    "8002": { "label": "user-service", "onAutoForward": "silent" },
+    "8003": { "label": "admin-service", "onAutoForward": "silent" },
+    "8004": { "label": "auth-service", "onAutoForward": "silent" },
+    "8005": { "label": "inventory-service", "onAutoForward": "silent" },
+    "8006": { "label": "order-service", "onAutoForward": "silent" },
+    "8007": { "label": "order-processor-service", "onAutoForward": "silent" },
+    "8008": { "label": "cart-service", "onAutoForward": "silent" },
+    "8009": { "label": "payment-service", "onAutoForward": "silent" },
+    "8010": { "label": "review-service", "onAutoForward": "silent" },
+    "8011": { "label": "notification-service", "onAutoForward": "silent" },
+    "8012": { "label": "audit-service", "onAutoForward": "silent" },
+    "8013": { "label": "chat-service", "onAutoForward": "silent" },
+    "8014": { "label": "web-bff", "onAutoForward": "notify" },
+    "15672": { "label": "RabbitMQ UI", "onAutoForward": "silent" },
+    "9411": { "label": "Zipkin Tracing", "onAutoForward": "silent" },
+    "8025": { "label": "Mailpit (Email)", "onAutoForward": "silent" }
+  },
+
+  // Connection strings use Docker service hostnames (not localhost) because
+  // service processes run inside the devcontainer which shares the xshopai-dev
+  // Docker network.  These override the localhost-based values in each
+  // service's .env file (dotenv does not override pre-set env vars by default).
+  //
+  // SECRETS (JWT_SECRET, etc.) are NOT listed here - set them once in your
+  // GitHub Codespaces user secrets at:
+  //   https://github.com/settings/codespaces
+  // and they are automatically injected into every Codespace you open.
+  // Required secrets:
+  //   JWT_SECRET                             - shared JWT signing key
+  //   AZURE_OPENAI_API_KEY                   - for chat-service (optional)
+  //   AZURE_OPENAI_ENDPOINT                  - for chat-service (optional)
+  //   AZURE_COMMUNICATION_CONNECTION_STRING  - for notification-service (optional)
+  "remoteEnv": {
+    // ── MongoDB ──────────────────────────────────────────────────────────────
+    "MONGODB_URI": "mongodb://admin:admin123@user-mongodb:27017/user_service_db?authSource=admin",
+    "USER_MONGODB_URL": "mongodb://admin:admin123@user-mongodb:27017/user_service_db?authSource=admin",
+    "PRODUCT_MONGODB_URL": "mongodb://admin:admin123@product-mongodb:27017/product_service_db?authSource=admin",
+    "REVIEW_MONGODB_URL": "mongodb://admin:admin123@review-mongodb:27017/review_service_db?authSource=admin",
+
+    // ── PostgreSQL ────────────────────────────────────────────────────────────
+    "AUDIT_POSTGRES_URL": "postgresql://admin:admin123@audit-postgres:5432/audit_service_db",
+    "ORDER_PROCESSOR_POSTGRES_URL": "postgresql://postgres:postgres@order-processor-postgres:5432/order_processor_db",
+
+    // ── SQL Server ────────────────────────────────────────────────────────────
+    "ORDER_SQLSERVER_URL": "Server=order-sqlserver,1433;Database=OrderServiceDB;User Id=sa;Password=Admin123!;TrustServerCertificate=True",
+    "PAYMENT_SQLSERVER_URL": "Server=payment-sqlserver,1433;Database=PaymentServiceDB;User Id=sa;Password=Admin123!;TrustServerCertificate=True",
+
+    // ── MySQL ─────────────────────────────────────────────────────────────────
+    "INVENTORY_MYSQL_URL": "mysql://admin:admin123@inventory-mysql:3306/inventory_service_db",
+
+    // ── RabbitMQ ──────────────────────────────────────────────────────────────
+    "RABBITMQ_URL": "amqp://admin:admin123@rabbitmq:5672",
+    "RABBITMQ_HOST": "rabbitmq",
+    "RABBITMQ_PORT": "5672",
+    "RABBITMQ_USER": "admin",
+    "RABBITMQ_PASSWORD": "admin123",
+
+    // ── Redis ─────────────────────────────────────────────────────────────────
+    "REDIS_HOST": "redis",
+    "REDIS_PORT": "6379",
+    "REDIS_PASSWORD": "redis_dev_pass_123",
+
+    // ── Observability ─────────────────────────────────────────────────────────
+    "ZIPKIN_URL": "http://zipkin:9411",
+    "MAILPIT_SMTP_HOST": "mailpit",
+    "MAILPIT_SMTP_PORT": "1025",
+
+    // ── General ───────────────────────────────────────────────────────────────
+    "NODE_ENV": "development",
+    "LOG_LEVEL": "debug",
+    "JWT_ALGORITHM": "HS256",
+    "JWT_EXPIRATION": "24h",
+    "JWT_ISSUER": "auth-service",
+    "SERVICE_INVOCATION_MODE": "http",
+    "CORS_ALLOWED_ORIGINS": "http://localhost:3000,http://localhost:3001"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // JavaScript / TypeScript / Node.js
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "christian-kohler.npm-intellisense",
+        // Python
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-python.black-formatter",
+        // Java
+        "vscjava.vscode-java-pack",
+        // .NET / C#
+        "ms-dotnettools.csdevkit",
+        // Docker
+        "ms-azuretools.vscode-docker",
+        // Databases
+        "mongodb.mongodb-vscode",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "mtxr.sqltools-driver-mssql",
+        "mtxr.sqltools-driver-mysql",
+        // REST testing
+        "humao.rest-client",
+        // Env files
+        "mikestead.dotenv",
+        // GitHub
+        "github.vscode-pull-request-github",
+        "github.copilot",
+        // Containers / Compose
+        "ms-vscode-remote.remote-containers"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "[csharp]": {
+          "editor.defaultFormatter": "ms-dotnettools.csdevkit"
+        },
+        "files.exclude": {
+          "**/node_modules": true,
+          "**/__pycache__": true,
+          "**/target": true,
+          "**/bin/Debug": true,
+          "**/bin/Release": true,
+          "**/obj": true
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+services:
+  # ============================================================================
+  # Devcontainer app service
+  # ============================================================================
+  # This is the container VS Code / Codespaces connects to.
+  # It joins the xshopai-dev network defined in ../docker-compose.yml so
+  # service processes started inside this container can reach every database,
+  # RabbitMQ, and Redis by Docker service name (e.g. "user-mongodb:27017").
+  app:
+    image: mcr.microsoft.com/devcontainers/universal:2
+    command: sleep infinity
+
+    networks:
+      - xshopai-dev
+
+    volumes:
+      # Persist package manager caches across container rebuilds to speed up
+      # subsequent postCreateCommand runs.
+      - devcontainer-npm-cache:/home/codespace/.npm
+      - devcontainer-m2-cache:/home/codespace/.m2
+      - devcontainer-pip-cache:/home/codespace/.cache/pip
+      - devcontainer-nuget-cache:/home/codespace/.nuget/packages
+
+# Named volumes for dependency caches
+volumes:
+  devcontainer-npm-cache:
+    name: xshopai-devcontainer-npm
+  devcontainer-m2-cache:
+    name: xshopai-devcontainer-m2
+  devcontainer-pip-cache:
+    name: xshopai-devcontainer-pip
+  devcontainer-nuget-cache:
+    name: xshopai-devcontainer-nuget

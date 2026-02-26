@@ -1,0 +1,138 @@
+{
+  "folders": [
+    { "name": "🛠  dev (infrastructure)", "path": "." },
+    { "name": "👤 user-service", "path": "../user-service" },
+    { "name": "🔐 auth-service", "path": "../auth-service" },
+    { "name": "📦 product-service", "path": "../product-service" },
+    { "name": "📝 order-service", "path": "../order-service" },
+    { "name": "⚙️  order-processor-service", "path": "../order-processor-service" },
+    { "name": "💳 payment-service", "path": "../payment-service" },
+    { "name": "🛒 cart-service", "path": "../cart-service" },
+    { "name": "📊 inventory-service", "path": "../inventory-service" },
+    { "name": "⭐ review-service", "path": "../review-service" },
+    { "name": "🔔 notification-service", "path": "../notification-service" },
+    { "name": "📋 audit-service", "path": "../audit-service" },
+    { "name": "💬 chat-service", "path": "../chat-service" },
+    { "name": "🛡️  admin-service", "path": "../admin-service" },
+    { "name": "🌐 web-bff", "path": "../web-bff" },
+    { "name": "🖥️  customer-ui", "path": "../customer-ui" },
+    { "name": "🖥️  admin-ui", "path": "../admin-ui" },
+    { "name": "🌱 db-seeder", "path": "../db-seeder" },
+  ],
+
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter",
+    },
+    "[csharp]": {
+      "editor.defaultFormatter": "ms-dotnettools.csdevkit",
+    },
+    "[java]": {
+      "editor.defaultFormatter": "redhat.java",
+    },
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      "**/target": true,
+      "**/bin/Debug": true,
+      "**/bin/Release": true,
+      "**/obj": true,
+      "**/.pytest_cache": true,
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/target": true,
+      "**/bin": true,
+      "**/obj": true,
+    },
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+    },
+  },
+
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "christian-kohler.npm-intellisense",
+      "ms-python.python",
+      "ms-python.pylint",
+      "ms-python.black-formatter",
+      "vscjava.vscode-java-pack",
+      "ms-dotnettools.csdevkit",
+      "ms-azuretools.vscode-docker",
+      "mongodb.mongodb-vscode",
+      "mtxr.sqltools",
+      "mtxr.sqltools-driver-pg",
+      "mtxr.sqltools-driver-mssql",
+      "mtxr.sqltools-driver-mysql",
+      "humao.rest-client",
+      "mikestead.dotenv",
+      "github.vscode-pull-request-github",
+      "github.copilot",
+    ],
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "compounds": [
+      {
+        "name": "Start All Services",
+        "configurations": [],
+        "preLaunchTask": "Start All Services",
+      },
+    ],
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start All Services",
+        "type": "shell",
+        "command": "cd /workspaces/dev && ./dev.sh",
+        "presentation": {
+          "reveal": "always",
+          "focus": true,
+          "panel": "dedicated",
+          "clear": true,
+        },
+        "runOptions": {
+          "runOn": "folderOpen",
+        },
+      },
+      {
+        "label": "Stop All Services",
+        "type": "shell",
+        "command": "cd /workspaces/dev && ./dev.sh --stop",
+        "presentation": {
+          "reveal": "always",
+          "focus": true,
+          "panel": "shared",
+        },
+      },
+      {
+        "label": "Infrastructure Up",
+        "type": "shell",
+        "command": "cd /workspaces/dev && docker compose up -d",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared",
+        },
+      },
+      {
+        "label": "Infrastructure Down",
+        "type": "shell",
+        "command": "cd /workspaces/dev && docker compose down",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared",
+        },
+      },
+    ],
+  },
+}
