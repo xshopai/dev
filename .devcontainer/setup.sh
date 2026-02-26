@@ -118,16 +118,39 @@ ALL_SERVICES=(
   "user-service"
   "web-bff"
 )
+
+# After copying .env.http -> .env, replace localhost DB/broker hostnames with
+# Docker Compose service names. Inter-service URLs (localhost:8001 etc.) are
+# left as-is because all services run inside the same devcontainer.
+fix_codespace_hostnames() {
+  local f="$1"
+  [ -f "$f" ] || return
+  sed -i \
+    -e 's|localhost:27018|user-mongodb:27017|g' \
+    -e 's|localhost:27019|product-mongodb:27017|g' \
+    -e 's|localhost:27020|review-mongodb:27017|g' \
+    -e 's|POSTGRES_HOST=localhost|POSTGRES_HOST=audit-postgres|g' \
+    -e 's|POSTGRES_PORT=5434|POSTGRES_PORT=5432|g' \
+    -e 's|RABBITMQ_URL=amqp://admin:admin123@localhost|RABBITMQ_URL=amqp://admin:admin123@rabbitmq|g' \
+    -e 's|localhost:3306|inventory-mysql:3306|g' \
+    -e 's|REDIS_HOST=localhost|REDIS_HOST=redis|g' \
+    -e 's|SMTP_HOST=localhost|SMTP_HOST=mailpit|g' \
+    -e 's|SMTP_PORT=1025.*|SMTP_PORT=1025|g' \
+    "$f"
+}
+
 for svc in "${ALL_SERVICES[@]}"; do
   target="$WORKSPACES_DIR/$svc/.env"
   if [ -f "$target" ]; then
     warn "$svc/.env already exists — not overwriting"
   elif [ -f "$WORKSPACES_DIR/$svc/.env.http" ]; then
     cp "$WORKSPACES_DIR/$svc/.env.http" "$target"
-    echo -e "  ${GREEN}✓${NC} $svc  (.env.http)"
+    fix_codespace_hostnames "$target"
+    echo -e "  ${GREEN}✓${NC} $svc  (.env.http → .env, hostnames patched)"
   elif [ -f "$WORKSPACES_DIR/$svc/.env.example" ]; then
     cp "$WORKSPACES_DIR/$svc/.env.example" "$target"
-    echo -e "  ${GREEN}✓${NC} $svc  (.env.example)"
+    fix_codespace_hostnames "$target"
+    echo -e "  ${GREEN}✓${NC} $svc  (.env.example → .env, hostnames patched)"
   else
     warn "$svc — no .env template found, skipping"
   fi
