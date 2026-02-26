@@ -166,6 +166,45 @@ fi
 success "Java dependencies resolved"
 
 # =============================================================================
+# 5b. Build / compile all services to catch errors early
+# =============================================================================
+log "Building Node.js / TypeScript services..."
+for svc in "${NODE_SERVICES[@]}"; do
+  path="$WORKSPACES_DIR/$svc"
+  if [ -f "$path/package.json" ] && grep -q '"build"' "$path/package.json" 2>/dev/null; then
+    (
+      cd "$path"
+      npm run build --if-present --silent 2>&1 | tail -3
+      echo -e "  ${GREEN}✓${NC} $svc  (build)"
+    ) &
+  fi
+done
+wait
+success "Node.js builds complete"
+
+log "Building .NET services..."
+for svc in "${DOTNET_SERVICES[@]}"; do
+  path="$WORKSPACES_DIR/$svc"
+  sln=$(find "$path" -maxdepth 2 -name "*.sln" 2>/dev/null | head -1)
+  if [ -n "$sln" ]; then
+    (
+      dotnet build "$sln" --configuration Release --no-restore --verbosity quiet 2>&1 | grep -E 'error|warning|Build succeeded|FAILED' || true
+      echo -e "  ${GREEN}✓${NC} $svc  (build)"
+    ) &
+  fi
+done
+wait
+success ".NET builds complete"
+
+log "Building Java service (order-processor-service)..."
+if [ -f "$OPS_PATH/pom.xml" ]; then
+  cd "$OPS_PATH"
+  mvn -q package -DskipTests
+  echo -e "  ${GREEN}✓${NC} order-processor-service  (build)"
+fi
+success "Java build complete"
+
+# =============================================================================
 # 6. Copy .env files for every service (only on first run, never overwrite)
 # =============================================================================
 
@@ -395,6 +434,14 @@ cd "$WORKSPACES_DIR/db-seeder/seed"
 python seed.py && success "Database seeding complete" || warn "db-seeder exited with errors — check output above"
 
 # =============================================================================
+# 9. Start all services in dev mode
+# =============================================================================
+log "Starting all services in dev mode..."
+cd "$WORKSPACES_DIR/dev"
+bash ./dev.sh
+success "All services started"
+
+# =============================================================================
 # Done
 # =============================================================================
 echo ""
@@ -404,9 +451,9 @@ echo -e "${GREEN}╠════════════════════
 echo -e "${GREEN}║  Infrastructure:  running via Docker Compose            ║${NC}"
 echo -e "${GREEN}║  Code:            all repos cloned to /workspaces/      ║${NC}"
 echo -e "${GREEN}║  Databases:       seeded with sample data               ║${NC}"
+echo -e "${GREEN}║  Services:        all running in dev mode               ║${NC}"
 echo -e "${GREEN}╠══════════════════════════════════════════════════════════╣${NC}"
-echo -e "${GREEN}║  Start all services:  cd /workspaces/dev && ./dev.sh    ║${NC}"
-echo -e "${GREEN}║  Stop all services:   ./dev.sh --stop                   ║${NC}"
+echo -e "${GREEN}║  Stop all services:  cd /workspaces/dev && ./dev.sh --stop ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "  Open the multi-root workspace for full code navigation:"
