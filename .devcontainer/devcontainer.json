@@ -8,6 +8,7 @@
   "dockerComposeFile": ["../docker-compose.yml", "docker-compose.devcontainer.yml"],
   "service": "app",
   "workspaceFolder": "/workspaces/dev",
+  "workspaceFile": "/workspaces/dev/xshopai.code-workspace",
 
   // Request a large machine - running 14 services + all databases needs it.
   // The user picks a machine >= these specs when creating the Codespace.
