@@ -21,16 +21,38 @@ find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages
 chmod -R 777 /home/codespace/.nuget 2>/dev/null || true
 
+# =============================================================================
+# Logging — tee everything to a persistent log file
+# =============================================================================
+LOG_DIR="$WORKSPACES_DIR/dev/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/setup.log"
+# Redirect all stdout+stderr through tee so both the terminal and the log file
+# receive every line for the rest of this script.
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
+_SETUP_START=$SECONDS
+
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-log()     { echo -e "${BLUE}[setup]${NC} $1"; }
-success() { echo -e "${GREEN}[setup]${NC} ✓ $1"; }
-warn()    { echo -e "${YELLOW}[setup]${NC} ⚠ $1"; }
+_ts() { date -u '+%H:%M:%S'; }
+log()     { echo -e "${BLUE}[setup $(_ts)]${NC} $1"; }
+success() { echo -e "${GREEN}[setup $(_ts)]${NC} ✓ $1"; }
+warn()    { echo -e "${YELLOW}[setup $(_ts)]${NC} ⚠ $1"; }
+err()     { echo -e "${RED}[setup $(_ts)]${NC} ✗ $1"; }
+
+# Trap any non-zero exit and print the failed command + line number before dying
+trap 'err "FAILED at line $LINENO: $BASH_COMMAND (exit $?)"; err "Full log: $LOG_FILE"' ERR
+
+# Helper: run a named step, print elapsed time when done
+_step_start() { _STEP_NAME="$1"; _STEP_T=$SECONDS; log "▶ $_STEP_NAME"; }
+_step_done()  { success "$_STEP_NAME  ($(( SECONDS - _STEP_T ))s)"; }
 
 echo -e "${CYAN}"
 echo "  ╔══════════════════════════════════════════╗"
@@ -62,6 +84,7 @@ REPOS=(
 )
 
 log "Cloning service repositories..."
+_step_start "Clone repositories"
 for repo in "${REPOS[@]}"; do
   target="$WORKSPACES_DIR/$repo"
   if [ -d "$target/.git" ]; then
@@ -74,6 +97,7 @@ done
 wait
 # Re-run chmod after clone so newly pulled scripts are also executable
 find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+_step_done
 success "All repositories cloned"
 
 # =============================================================================
@@ -91,7 +115,9 @@ success "Infrastructure containers already running (started by Codespaces)"
 #    and React — WORKSPACE_ROOT in that script resolves to /workspaces/.
 # =============================================================================
 log "Installing dependencies and building all services (this takes a few minutes)..."
+_step_start "Build all services"
 bash /workspaces/dev/build.sh --all
+_step_done
 success "All services built"
 
 # =============================================================================
@@ -110,6 +136,7 @@ fi
 # For each service, prefer .env.http (direct HTTP mode), fall back to .env.example
 # NOTE: order-service, payment-service, order-processor-service use JSON/YAML config — handled below
 log "Seeding service .env files..."
+_step_start "Seed .env files"
 ALL_SERVICES=(
   "admin-service"
   "audit-service"
@@ -160,6 +187,7 @@ for svc in "${ALL_SERVICES[@]}"; do
     warn "$svc — no .env template found, skipping"
   fi
 done
+_step_done
 success "Service .env files seeded"
 
 # =============================================================================
@@ -169,6 +197,7 @@ success "Service .env files seeded"
 #     starting, so we write Codespace-correct versions here.
 # =============================================================================
 log "Writing Codespace config for .NET / Java services..."
+_step_start "Write .NET/Java configs"
 
 # --- order-service: appsettings.Development.json ---
 ORDER_SETTINGS="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Development.json"
@@ -281,6 +310,7 @@ logging:
     com.xshopai.orderprocessor: INFO
 EOF
 echo -e "  ${GREEN}✓${NC} order-processor-service  (application-dev.yml)"
+_step_done
 success "Non-.env service configs written"
 
 # =============================================================================
@@ -294,7 +324,9 @@ success "Non-.env service configs written"
 #    are ready — no sleep needed.
 # =============================================================================
 log "Installing db-seeder Python dependencies..."
+_step_start "Install db-seeder deps"
 pip install -q -r "$WORKSPACES_DIR/db-seeder/seed/requirements.txt"
+_step_done
 success "db-seeder dependencies installed"
 
 # Write seed/.env pointing to Docker Compose service hostnames (internal network)
@@ -338,15 +370,18 @@ EOF
 success "db-seeder .env written"
 
 log "Running db-seeder..."
+_step_start "Seed databases"
 cd "$WORKSPACES_DIR/db-seeder/seed"
-python seed.py && success "Database seeding complete" || warn "db-seeder exited with errors — check output above"
+python seed.py && _step_done && success "Database seeding complete" || { warn "db-seeder exited with errors — check output above"; }
 
 # =============================================================================
 # 10. Start all services in dev mode
 # =============================================================================
 log "Starting all services in dev mode..."
+_step_start "Start services"
 cd "$WORKSPACES_DIR/dev"
 bash ./dev.sh
+_step_done
 success "All services started"
 
 # =============================================================================
@@ -362,8 +397,11 @@ echo -e "${GREEN}║  Databases:       seeded with sample data               ║
 echo -e "${GREEN}║  Services:        all running in dev mode               ║${NC}"
 echo -e "${GREEN}╠══════════════════════════════════════════════════════════╣${NC}"
 echo -e "${GREEN}║  Stop all services:  cd /workspaces/dev && ./dev.sh --stop ║${NC}"
+echo -e "${GREEN}╠══════════════════════════════════════════════════════════╣${NC}"
+echo -e "${GREEN}║  Log file:  /workspaces/dev/logs/setup.log              ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 # Open the multi-root workspace so all service folders appear in the Explorer
 code /workspaces/dev/xshopai.code-workspace 2>/dev/null || true
 echo ""
+echo "=== setup.sh completed in $(( SECONDS - _SETUP_START ))s at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
