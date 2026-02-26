@@ -12,6 +12,10 @@ set -e
 WORKSPACES_DIR="/workspaces"
 ORG="xshopai"
 
+# Fix execute permissions upfront — Windows checkouts strip the +x bit.
+# Run this before anything else so dev.sh / scripts/dev.sh are always runnable.
+find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -63,6 +67,8 @@ for repo in "${REPOS[@]}"; do
   fi
 done
 wait
+# Re-run chmod after clone so newly pulled scripts are also executable
+find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 success "All repositories cloned"
 
 # =============================================================================

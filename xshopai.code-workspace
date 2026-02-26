@@ -101,9 +101,7 @@
           "panel": "dedicated",
           "clear": true,
         },
-        "runOptions": {
-          "runOn": "folderOpen",
-        },
+        "runOptions": {},
       },
       {
         "label": "Stop All Services",
