@@ -63,7 +63,7 @@ for repo in "${REPOS[@]}"; do
     warn "$repo already exists — skipping"
   else
     log "  Cloning $repo..."
-    gh repo clone "$ORG/$repo" "$target" -- --depth 1 &
+    git clone --depth 1 "https://github.com/$ORG/$repo.git" "$target" &
   fi
 done
 wait
@@ -75,10 +75,10 @@ success "All repositories cloned"
 # 2. Start shared infrastructure early so databases warm up in parallel
 #    with the install and build steps below.
 # =============================================================================
-log "Starting infrastructure services (databases, RabbitMQ, Redis, etc.)..."
-cd "$WORKSPACES_DIR/dev"
-docker compose up -d
-success "Infrastructure containers started — warming up in background"
+# Infrastructure services (MongoDB, Redis, RabbitMQ, SQL Server, etc.) are
+# already running — Codespaces started them via the dockerComposeFile entries
+# in devcontainer.json before this script was invoked.
+success "Infrastructure containers already running (started by Codespaces)"
 
 # =============================================================================
 # 3. Install Node.js dependencies for all JS/TS services in parallel
@@ -460,6 +460,6 @@ echo -e "${GREEN}╠════════════════════
 echo -e "${GREEN}║  Stop all services:  cd /workspaces/dev && ./dev.sh --stop ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "  Open the multi-root workspace for full code navigation:"
-echo -e "  ${CYAN}code /workspaces/dev/xshopai.code-workspace${NC}"
+# Open the multi-root workspace so all service folders appear in the Explorer
+code /workspaces/dev/xshopai.code-workspace 2>/dev/null || true
 echo ""
