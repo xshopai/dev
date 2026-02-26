@@ -14,6 +14,10 @@ services:
       - xshopai-dev
 
     volumes:
+      # Docker socket — gives the devcontainer access to the host Docker daemon
+      # so `docker ps`, `docker logs`, and the VS Code Docker extension all work
+      # (Docker-outside-of-Docker pattern, read-only is enough for inspection)
+      - /var/run/docker.sock:/var/run/docker.sock
       # Persist package manager caches across container rebuilds to speed up
       # subsequent postCreateCommand runs.
       - devcontainer-npm-cache:/home/codespace/.npm
