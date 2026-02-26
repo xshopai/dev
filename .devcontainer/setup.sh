@@ -72,7 +72,16 @@ find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 success "All repositories cloned"
 
 # =============================================================================
-# 2. Install Node.js dependencies for all JS/TS services in parallel
+# 2. Start shared infrastructure early so databases warm up in parallel
+#    with the install and build steps below.
+# =============================================================================
+log "Starting infrastructure services (databases, RabbitMQ, Redis, etc.)..."
+cd "$WORKSPACES_DIR/dev"
+docker compose up -d
+success "Infrastructure containers started — warming up in background"
+
+# =============================================================================
+# 3. Install Node.js dependencies for all JS/TS services in parallel
 # =============================================================================
 NODE_SERVICES=(
   "admin-service"
@@ -108,7 +117,7 @@ wait
 success "Node.js dependencies installed"
 
 # =============================================================================
-# 3. Install Python dependencies in parallel
+# 4. Install Python dependencies in parallel
 # =============================================================================
 PYTHON_SERVICES=(
   "inventory-service"
@@ -130,7 +139,7 @@ wait
 success "Python dependencies installed"
 
 # =============================================================================
-# 4. Restore .NET dependencies in parallel
+# 5. Restore .NET dependencies in parallel
 # =============================================================================
 DOTNET_SERVICES=(
   "order-service"
@@ -152,7 +161,7 @@ wait
 success ".NET dependencies restored"
 
 # =============================================================================
-# 5. Resolve Java / Maven dependencies
+# 6. Resolve Java / Maven dependencies
 # =============================================================================
 log "Resolving Java dependencies (order-processor-service)..."
 OPS_PATH="$WORKSPACES_DIR/order-processor-service"
@@ -166,7 +175,7 @@ fi
 success "Java dependencies resolved"
 
 # =============================================================================
-# 5b. Build / compile all services to catch errors early
+# 6b. Build / compile all services to catch errors early
 # =============================================================================
 log "Building Node.js / TypeScript services..."
 for svc in "${NODE_SERVICES[@]}"; do
@@ -205,7 +214,7 @@ fi
 success "Java build complete"
 
 # =============================================================================
-# 6. Copy .env files for every service (only on first run, never overwrite)
+# 7. Copy .env files for every service (only on first run, never overwrite)
 # =============================================================================
 
 # dev infrastructure .env
@@ -371,15 +380,14 @@ echo -e "  ${GREEN}✓${NC} order-processor-service  (application-dev.yml)"
 success "Non-.env service configs written"
 
 # =============================================================================
-# 7. Start shared infrastructure (databases, RabbitMQ, Redis, etc.)
+# 8. Start shared infrastructure (databases, RabbitMQ, Redis, etc.)
 # =============================================================================
-log "Starting infrastructure services..."
-cd "$WORKSPACES_DIR/dev"
-docker compose up -d
-success "Infrastructure is running"
+# (already started in step 2 — skipped here)
 
 # =============================================================================
-# 8. Seed databases with sample data via db-seeder
+# 9. Seed databases with sample data via db-seeder
+#    Infrastructure has been running since step 2 (~10 min) so all DBs
+#    are ready — no sleep needed.
 # =============================================================================
 log "Installing db-seeder Python dependencies..."
 pip install -q -r "$WORKSPACES_DIR/db-seeder/seed/requirements.txt"
@@ -425,16 +433,12 @@ REDIS_PASSWORD=redis_dev_pass_123
 EOF
 success "db-seeder .env written"
 
-# Wait for databases to accept connections (SQL Server needs the longest warm-up)
-log "Waiting 30 s for all databases to be ready..."
-sleep 30
-
 log "Running db-seeder..."
 cd "$WORKSPACES_DIR/db-seeder/seed"
 python seed.py && success "Database seeding complete" || warn "db-seeder exited with errors — check output above"
 
 # =============================================================================
-# 9. Start all services in dev mode
+# 10. Start all services in dev mode
 # =============================================================================
 log "Starting all services in dev mode..."
 cd "$WORKSPACES_DIR/dev"
