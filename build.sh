@@ -34,7 +34,7 @@ declare -A SERVICES=(
     ["order-service"]="dotnet:."
     ["payment-service"]="dotnet:."
     ["order-processor-service"]="java:."
-    ["cart-service"]="java:."
+    ["cart-service"]="typescript:."
     ["admin-ui"]="react:."
     ["customer-ui"]="react:."
 )
