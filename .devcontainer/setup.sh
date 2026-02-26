@@ -16,6 +16,11 @@ ORG="xshopai"
 # Run this before anything else so dev.sh / scripts/dev.sh are always runnable.
 find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 
+# Fix NuGet directory permissions — the named cache volume is created by Docker
+# as root, which makes /home/codespace/.nuget unreadable by the codespace user.
+mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages
+chmod -R 777 /home/codespace/.nuget 2>/dev/null || true
+
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
