@@ -401,7 +401,9 @@ echo -e "${GREEN}╠════════════════════
 echo -e "${GREEN}║  Log file:  /workspaces/dev/logs/setup.log              ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
-# Open the multi-root workspace so all service folders appear in the Explorer
-code /workspaces/dev/xshopai.code-workspace 2>/dev/null || true
+# Open the multi-root workspace so all service folders appear in the Explorer.
+# Runs at the END of setup so all repo folders already exist.
+# -r reuses the current VS Code window instead of opening a new one.
+code -r /workspaces/dev/xshopai.code-workspace 2>/dev/null || true
 echo ""
 echo "=== setup.sh completed in $(( SECONDS - _SETUP_START ))s at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
