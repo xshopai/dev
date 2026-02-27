@@ -22,10 +22,13 @@ if [ ! -d "$SEED_DIR" ]; then
 fi
 
 # =============================================================================
-# 1. Write .env with Docker Compose service hostnames
+# 1. Write .env.dev with Docker Compose service hostnames
 # =============================================================================
-log "Writing db-seeder .env..."
-cat > "$SEED_DIR/.env" << 'EOF'
+# seed.py always loads .env.dev first (if it exists), then falls back to .env.
+# The committed .env.dev contains localhost ports — we overwrite it here with
+# the correct container_name (dev-*) hostnames so the seeder can reach them.
+log "Writing db-seeder .env.dev..."
+cat > "$SEED_DIR/.env.dev" << 'EOF'
 # MongoDB
 USER_MONGODB_URI=mongodb://admin:admin123@dev-user-mongodb:27017/user_service_db?authSource=admin
 PRODUCT_MONGODB_URI=mongodb://admin:admin123@dev-product-mongodb:27017/product_service_db?authSource=admin
@@ -61,7 +64,7 @@ REDIS_HOST=dev-redis
 REDIS_PORT=6379
 REDIS_PASSWORD=redis_dev_pass_123
 EOF
-success "db-seeder .env written"
+success "db-seeder .env.dev written"
 
 # =============================================================================
 # 2. Install Python deps
