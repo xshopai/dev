@@ -25,7 +25,7 @@ fi
 # 1. Write .env with Docker Compose service hostnames
 # =============================================================================
 # seed.py loads .env from its own directory (Path(__file__).parent / '.env').
-# The committed .env.dev/.env.example contains localhost values — we write
+# The committed .env.example contains localhost values — we write
 # .env here with dev-* container_name hostnames so the seeder can reach them.
 log "Writing db-seeder .env..."
 cat > "$SEED_DIR/.env" << 'EOF'
