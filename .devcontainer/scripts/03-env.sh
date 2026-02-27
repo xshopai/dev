@@ -47,18 +47,24 @@ patch_hostnames() {
 seed_env() {
   local svc="$1"
   local target="$WORKSPACES_DIR/$svc/.env"
+  local http="$WORKSPACES_DIR/$svc/.env.http"
+
+  # ALWAYS patch .env.http first — service startup scripts (scripts/dev.sh)
+  # unconditionally copy .env.http → .env on every launch, which would
+  # overwrite any patches we apply to .env.  Patching the source file
+  # ensures the copy already contains the correct container hostnames.
+  [ -f "$http" ] && patch_hostnames "$http"
 
   if [ -f "$target" ]; then
     # File already exists (committed in repo with localhost hostnames).
-    # Always patch so infra connections resolve correctly inside the container.
+    # Patch it too so it's correct even before the service restarts.
     patch_hostnames "$target"
     success "$svc  (.env exists — hostnames patched)"
     return
   fi
 
-  if [ -f "$WORKSPACES_DIR/$svc/.env.http" ]; then
-    cp "$WORKSPACES_DIR/$svc/.env.http" "$target"
-    patch_hostnames "$target"
+  if [ -f "$http" ]; then
+    cp "$http" "$target"
     success "$svc  (.env.http → .env)"
   elif [ -f "$WORKSPACES_DIR/$svc/.env.example" ]; then
     cp "$WORKSPACES_DIR/$svc/.env.example" "$target"
