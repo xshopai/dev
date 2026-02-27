@@ -7,7 +7,7 @@
 # =============================================================================
 
 WORKSPACES_DIR="/workspaces"
-SEED_DIR="$WORKSPACES_DIR/db-seeder/seed"
+SEED_DIR="$WORKSPACES_DIR/db-seeder"
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; RED='\033[0;31m'; NC='\033[0m'
 _ts() { date -u '+%H:%M:%S'; }
@@ -22,13 +22,13 @@ if [ ! -d "$SEED_DIR" ]; then
 fi
 
 # =============================================================================
-# 1. Write .env.dev with Docker Compose service hostnames
+# 1. Write .env with Docker Compose service hostnames
 # =============================================================================
-# seed.py always loads .env.dev first (if it exists), then falls back to .env.
-# The committed .env.dev contains localhost ports — we overwrite it here with
-# the correct container_name (dev-*) hostnames so the seeder can reach them.
-log "Writing db-seeder .env.dev..."
-cat > "$SEED_DIR/.env.dev" << 'EOF'
+# seed.py loads .env from its own directory (Path(__file__).parent / '.env').
+# The committed .env.dev/.env.example contains localhost values — we write
+# .env here with dev-* container_name hostnames so the seeder can reach them.
+log "Writing db-seeder .env..."
+cat > "$SEED_DIR/.env" << 'EOF'
 # MongoDB
 USER_MONGODB_URI=mongodb://admin:admin123@dev-user-mongodb:27017/user_service_db?authSource=admin
 PRODUCT_MONGODB_URI=mongodb://admin:admin123@dev-product-mongodb:27017/product_service_db?authSource=admin
@@ -64,7 +64,7 @@ REDIS_HOST=dev-redis
 REDIS_PORT=6379
 REDIS_PASSWORD=redis_dev_pass_123
 EOF
-success "db-seeder .env.dev written"
+success "db-seeder .env written"
 
 # =============================================================================
 # 2. Install Python deps
