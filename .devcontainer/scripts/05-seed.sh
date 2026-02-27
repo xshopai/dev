@@ -27,37 +27,37 @@ fi
 log "Writing db-seeder .env..."
 cat > "$SEED_DIR/.env" << 'EOF'
 # MongoDB
-USER_MONGODB_URI=mongodb://admin:admin123@user-mongodb:27017/user_service_db?authSource=admin
-PRODUCT_MONGODB_URI=mongodb://admin:admin123@product-mongodb:27017/product_service_db?authSource=admin
-REVIEW_MONGODB_URI=mongodb://admin:admin123@review-mongodb:27017/review_service_db?authSource=admin
+USER_MONGODB_URI=mongodb://admin:admin123@dev-user-mongodb:27017/user_service_db?authSource=admin
+PRODUCT_MONGODB_URI=mongodb://admin:admin123@dev-product-mongodb:27017/product_service_db?authSource=admin
+REVIEW_MONGODB_URI=mongodb://admin:admin123@dev-review-mongodb:27017/review_service_db?authSource=admin
 
 # PostgreSQL — audit-service
-POSTGRES_HOST=audit-postgres
+POSTGRES_HOST=dev-audit-postgres
 POSTGRES_PORT=5432
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin123
 POSTGRES_DB=audit_service_db
 
 # MySQL — inventory-service
-MYSQL_SERVER_CONNECTION=mysql+pymysql://admin:admin123@inventory-mysql:3306
+MYSQL_SERVER_CONNECTION=mysql+pymysql://admin:admin123@dev-inventory-mysql:3306
 INVENTORY_DB_NAME=inventory_service_db
 
 # SQL Server — order-service
-ORDER_SQLSERVER_HOST=order-sqlserver
+ORDER_SQLSERVER_HOST=dev-order-sqlserver
 ORDER_SQLSERVER_PORT=1433
 ORDER_SQLSERVER_USER=sa
 ORDER_SQLSERVER_PASSWORD=Admin123!
 ORDER_SQLSERVER_DB=order_service_db
 
 # SQL Server — payment-service
-PAYMENT_SQLSERVER_HOST=payment-sqlserver
+PAYMENT_SQLSERVER_HOST=dev-payment-sqlserver
 PAYMENT_SQLSERVER_PORT=1433
 PAYMENT_SQLSERVER_USER=sa
 PAYMENT_SQLSERVER_PASSWORD=Admin123!
 PAYMENT_SQLSERVER_DB=payment_service_db
 
 # Redis — cart-service
-REDIS_HOST=redis
+REDIS_HOST=dev-redis
 REDIS_PORT=6379
 REDIS_PASSWORD=redis_dev_pass_123
 EOF
