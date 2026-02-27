@@ -30,19 +30,23 @@ wait_for_port() {
 
 log "Checking infrastructure health..."
 
+# Container names are prefixed with "dev-" (set via container_name: in docker-compose.yml).
+# From an external container on the same network, DNS resolves by container_name, not
+# the Compose service name — so we must use the dev- prefix here.
+
 # Run all checks in parallel
-wait_for_port user-mongodb     27017 "MongoDB (user)"        90 &
-wait_for_port product-mongodb  27017 "MongoDB (product)"     90 &
-wait_for_port review-mongodb   27017 "MongoDB (review)"      90 &
-wait_for_port audit-postgres   5432  "PostgreSQL (audit)"    90 &
-wait_for_port order-processor-postgres 5432 "PostgreSQL (order-processor)" 90 &
-wait_for_port order-sqlserver  1433  "SQL Server (order)"   120 &
-wait_for_port payment-sqlserver 1433 "SQL Server (payment)" 120 &
-wait_for_port inventory-mysql  3306  "MySQL (inventory)"     90 &
-wait_for_port rabbitmq         5672  "RabbitMQ"              90 &
-wait_for_port redis            6379  "Redis"                 60 &
-wait_for_port zipkin           9411  "Zipkin"                60 &
-wait_for_port mailpit          1025  "Mailpit (SMTP)"        60 &
+wait_for_port dev-user-mongodb     27017 "MongoDB (user)"        90 &
+wait_for_port dev-product-mongodb  27017 "MongoDB (product)"     90 &
+wait_for_port dev-review-mongodb   27017 "MongoDB (review)"      90 &
+wait_for_port dev-audit-postgres   5432  "PostgreSQL (audit)"    90 &
+wait_for_port dev-order-processor-postgres 5432 "PostgreSQL (order-processor)" 90 &
+wait_for_port dev-order-sqlserver  1433  "SQL Server (order)"   120 &
+wait_for_port dev-payment-sqlserver 1433 "SQL Server (payment)" 120 &
+wait_for_port dev-inventory-mysql  3306  "MySQL (inventory)"     90 &
+wait_for_port dev-rabbitmq         5672  "RabbitMQ"              90 &
+wait_for_port dev-redis            6379  "Redis"                 60 &
+wait_for_port dev-zipkin           9411  "Zipkin"                60 &
+wait_for_port dev-mailpit          1025  "Mailpit (SMTP)"        60 &
 
 wait
 

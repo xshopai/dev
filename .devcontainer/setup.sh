@@ -69,7 +69,7 @@ run_step() {
   chmod +x "$script" 2>/dev/null || true
 
   # Pipe step output to its own log file as well as the main setup log
-  local step_log="$LOG_DIR/$(echo "$name" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | tr '.' '-').log"
+  local step_log="$LOG_DIR/$(echo "$name" | tr ' /\\' '---' | tr '[:upper:]' '[:lower:]' | tr '.' '-').log"
   if bash "$script" "$@" 2>&1 | stdbuf -oL tee "$step_log"; then
     STEP_STATUS["$name"]="ok"
     success "$name  ($(( SECONDS - t ))s)"

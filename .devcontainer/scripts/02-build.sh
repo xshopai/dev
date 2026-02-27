@@ -19,9 +19,13 @@ success() { echo -e "${GREEN}[build $(_ts)]${NC} ✓ $1"; }
 warn()    { echo -e "${YELLOW}[build $(_ts)]${NC} ⚠ $1"; }
 err()     { echo -e "${RED}[build $(_ts)]${NC} ✗ $1"; }
 
-# Results tracking
-declare -A RESULTS   # RESULTS[svc]="SUCCESS|FAILED"
+# Results tracking — use temp files so background subshells can write results
+# back to the parent (bash associative arrays don't cross subprocess boundaries)
+declare -A RESULTS   # RESULTS[svc]="SUCCESS|FAILED|SKIPPED"
 declare -A TIMINGS   # TIMINGS[svc]=seconds
+RESULTS_DIR="/tmp/xshopai-build-results"
+rm -rf "$RESULTS_DIR"
+mkdir -p "$RESULTS_DIR"
 
 # -----------------------------------------------------------------------------
 # build_service <name> <dir> <cmd>
@@ -35,21 +39,20 @@ build_service() {
 
   if [ ! -d "$dir" ]; then
     warn "$name — directory $dir not found, skipping"
-    RESULTS[$name]="SKIPPED"
-    TIMINGS[$name]=0
+    echo "SKIPPED 0" > "$RESULTS_DIR/$name"
     return
   fi
 
   ( cd "$dir" && eval "$cmd" ) >> "$log_file" 2>&1
   local exit_code=$?
+  local elapsed=$(( SECONDS - t_start ))
 
-  TIMINGS[$name]=$(( SECONDS - t_start ))
   if [ $exit_code -eq 0 ]; then
-    RESULTS[$name]="SUCCESS"
-    success "$name  (${TIMINGS[$name]}s)"
+    echo "SUCCESS $elapsed" > "$RESULTS_DIR/$name"
+    success "$name  (${elapsed}s)"
   else
-    RESULTS[$name]="FAILED"
-    err "$name  (${TIMINGS[$name]}s) — see $log_file"
+    echo "FAILED $elapsed" > "$RESULTS_DIR/$name"
+    err "$name  (${elapsed}s) — see $log_file"
   fi
 }
 
@@ -104,13 +107,28 @@ build_service "order-service" "$WORKSPACES_DIR/order-service" \
   "dotnet restore OrderService.sln && dotnet build OrderService.sln --no-restore -c Release 2>&1" &
 
 build_service "payment-service" "$WORKSPACES_DIR/payment-service" \
-  "dotnet restore && dotnet build --no-restore -c Release 2>&1" &
+  "dotnet restore PaymentService/PaymentService.csproj && dotnet build PaymentService/PaymentService.csproj --no-restore -c Release 2>&1" &
 
 build_service "order-processor-service" "$WORKSPACES_DIR/order-processor-service" \
   "mvn -q clean package -DskipTests 2>&1" &
 
 wait
 success "Wave 3 complete"
+
+# Load results from temp files (subshells can't write to parent's arrays)
+ALL_SERVICES_LIST=(
+  "${NODE_SERVICES[@]}" "${TS_SERVICES[@]}" "${UI_SERVICES[@]}"
+  "product-service" "inventory-service"
+  "order-service" "payment-service" "order-processor-service"
+)
+for svc in "${ALL_SERVICES_LIST[@]}"; do
+  f="$RESULTS_DIR/$svc"
+  if [ -f "$f" ]; then
+    read -r status time < "$f"
+    RESULTS[$svc]=$status
+    TIMINGS[$svc]=$time
+  fi
+done
 
 # =============================================================================
 # Summary table

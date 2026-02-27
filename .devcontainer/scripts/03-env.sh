@@ -18,23 +18,25 @@ warn()    { echo -e "${YELLOW}[env $(_ts)]${NC} ⚠ $1"; }
 err()     { echo -e "${RED}[env $(_ts)]${NC} ✗ $1"; }
 
 # -----------------------------------------------------------------------------
-# Patch localhost DB/broker hostnames → Docker Compose service names.
-# Inter-service HTTP URLs (localhost:800x) are intentionally left as-is —
-# all services share the same devcontainer network.
+# Patch localhost DB/broker hostnames → Docker container_name values.
+# Infra containers use 'container_name: dev-<svc>' in docker-compose.yml.
+# container_name DNS works from ANY container on the same network;
+# Compose service-name aliases only work within the same Compose project.
+# Inter-service HTTP URLs (localhost:800x) are intentionally left as-is.
 # -----------------------------------------------------------------------------
 patch_hostnames() {
   local f="$1"
   [ -f "$f" ] || return
   sed -i \
-    -e 's|localhost:27018|user-mongodb:27017|g' \
-    -e 's|localhost:27019|product-mongodb:27017|g' \
-    -e 's|localhost:27020|review-mongodb:27017|g' \
-    -e 's|POSTGRES_HOST=localhost|POSTGRES_HOST=audit-postgres|g' \
+    -e 's|localhost:27018|dev-user-mongodb:27017|g' \
+    -e 's|localhost:27019|dev-product-mongodb:27017|g' \
+    -e 's|localhost:27020|dev-review-mongodb:27017|g' \
+    -e 's|POSTGRES_HOST=localhost|POSTGRES_HOST=dev-audit-postgres|g' \
     -e 's|POSTGRES_PORT=5434|POSTGRES_PORT=5432|g' \
-    -e 's|RABBITMQ_URL=amqp://admin:admin123@localhost|RABBITMQ_URL=amqp://admin:admin123@rabbitmq|g' \
-    -e 's|localhost:3306|inventory-mysql:3306|g' \
-    -e 's|REDIS_HOST=localhost|REDIS_HOST=redis|g' \
-    -e 's|SMTP_HOST=localhost|SMTP_HOST=mailpit|g' \
+    -e 's|RABBITMQ_URL=amqp://admin:admin123@localhost|RABBITMQ_URL=amqp://admin:admin123@dev-rabbitmq|g' \
+    -e 's|localhost:3306|dev-inventory-mysql:3306|g' \
+    -e 's|REDIS_HOST=localhost|REDIS_HOST=dev-redis|g' \
+    -e 's|SMTP_HOST=localhost|SMTP_HOST=dev-mailpit|g' \
     -e 's|SMTP_PORT=1025.*|SMTP_PORT=1025|g' \
     "$f"
 }
@@ -100,7 +102,7 @@ else
   "MESSAGING_PROVIDER": "rabbitmq",
   "Dapr": { "Enabled": false },
   "RabbitMQ": {
-    "Host": "rabbitmq",
+    "Host": "dev-rabbitmq",
     "Port": 5672,
     "Username": "admin",
     "Password": "admin123",
@@ -112,10 +114,10 @@ else
     "Issuer": "auth-service",
     "Audience": "xshopai-platform"
   },
-  "DATABASE_CONNECTION_STRING": "Server=order-sqlserver,1433;Database=order_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False",
+  "DATABASE_CONNECTION_STRING": "Server=dev-order-sqlserver,1433;Database=order_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False",
   "Tracing": {
     "Exporter": "zipkin",
-    "ZipkinEndpoint": "http://zipkin:9411/api/v2/spans",
+    "ZipkinEndpoint": "http://dev-zipkin:9411/api/v2/spans",
     "ServiceName": "order-service"
   }
 }
@@ -141,7 +143,7 @@ else
     "Stripe": { "IsEnabled": false }
   },
   "RabbitMQ": {
-    "Host": "rabbitmq",
+    "Host": "dev-rabbitmq",
     "Port": 5672,
     "Username": "admin",
     "Password": "admin123",
@@ -154,11 +156,11 @@ else
     "Audience": "xshopai-platform"
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Server=payment-sqlserver,1433;Database=payment_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False"
+    "DefaultConnection": "Server=dev-payment-sqlserver,1433;Database=payment_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False"
   },
   "Tracing": {
     "Exporter": "zipkin",
-    "ZipkinEndpoint": "http://zipkin:9411/api/v2/spans",
+    "ZipkinEndpoint": "http://dev-zipkin:9411/api/v2/spans",
     "ServiceName": "payment-service"
   }
 }
@@ -183,7 +185,7 @@ messaging:
   provider: rabbitmq
 
 rabbitmq:
-  host: rabbitmq
+  host: dev-rabbitmq
   port: 5672
   username: admin
   password: admin123
@@ -193,7 +195,7 @@ rabbitmq:
 
 spring:
   datasource:
-    url: jdbc:postgresql://order-processor-postgres:5432/order_processor_db
+    url: jdbc:postgresql://dev-order-processor-postgres:5432/order_processor_db
     username: postgres
     password: postgres
 
