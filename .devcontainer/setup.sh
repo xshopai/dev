@@ -1,57 +1,42 @@
 #!/bin/bash
 # =============================================================================
-# xshopai Codespace Setup Script
+# xshopai Codespace Setup Script — Orchestrator
 # =============================================================================
 # Runs once after the devcontainer is first created (postCreateCommand).
-# Clones all service repositories, installs every runtime's dependencies,
-# boots the shared infrastructure, and opens the multi-root workspace.
+#
+# Design principles:
+#   - No top-level set -e: each step is fail-soft; failures are tracked and
+#     reported in a summary table rather than aborting the whole run.
+#   - Sub-scripts: each phase lives in .devcontainer/scripts/ and writes its
+#     own log to /workspaces/dev/logs/<step>.log
+#   - Parallel builds: 02-build.sh groups services by runtime and runs waves
+#     in parallel, with per-service log files for easy debugging.
 # =============================================================================
-
-set -e
 
 WORKSPACES_DIR="/workspaces"
-ORG="xshopai"
-
-# =============================================================================
-# Logging — set up FIRST so every subsequent failure is captured
-# =============================================================================
+SCRIPTS_DIR="$WORKSPACES_DIR/dev/.devcontainer/scripts"
 LOG_DIR="$WORKSPACES_DIR/dev/logs"
 mkdir -p "$LOG_DIR"
+
 LOG_FILE="$LOG_DIR/setup.log"
-# Redirect all stdout+stderr through tee so both the terminal and the log file
-# receive every line for the rest of this script.
-# Use stdbuf -oL to force line-buffered output so tail -f sees every line
-# immediately rather than waiting for the pipe buffer to fill.
 exec > >(stdbuf -oL tee -a "$LOG_FILE") 2>&1
 echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
 _SETUP_START=$SECONDS
 
 # Colors
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-CYAN='\033[0;36m'
-NC='\033[0m'
+GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'
+RED='\033[0;31m';   CYAN='\033[0;36m';   NC='\033[0m'
 
-_ts() { date -u '+%H:%M:%S'; }
+_ts()     { date -u '+%H:%M:%S'; }
 log()     { echo -e "${BLUE}[setup $(_ts)]${NC} $1"; }
 success() { echo -e "${GREEN}[setup $(_ts)]${NC} ✓ $1"; }
 warn()    { echo -e "${YELLOW}[setup $(_ts)]${NC} ⚠ $1"; }
 err()     { echo -e "${RED}[setup $(_ts)]${NC} ✗ $1"; }
 
-# Trap any non-zero exit and print the failed command + line number before dying
-trap 'err "FAILED at line $LINENO: $BASH_COMMAND (exit $?)"; err "Full log: $LOG_FILE"' ERR
+# Fix execute permissions (Windows checkouts strip +x)
+find "$WORKSPACES_DIR/dev" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 
-# Helper: run a named step, print elapsed time when done
-_step_start() { _STEP_NAME="$1"; _STEP_T=$SECONDS; log "▶ $_STEP_NAME"; }
-_step_done()  { success "$_STEP_NAME  ($(( SECONDS - _STEP_T ))s)"; }
-
-# Fix execute permissions — Windows checkouts strip the +x bit.
-find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-
-# Fix NuGet directory permissions — named cache volume is created by Docker as
-# root, making /home/codespace/.nuget unreadable by the codespace user.
+# Fix NuGet directory permissions (named volume created as root)
 mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages 2>/dev/null || true
 chmod -R 777 /home/codespace/.nuget 2>/dev/null || true
 
@@ -62,349 +47,92 @@ echo "  ╚═══════════════════════
 echo -e "${NC}"
 
 # =============================================================================
-# 1. Clone all service repositories in parallel
+# Step runner — fail-soft: records failures without aborting
 # =============================================================================
-REPOS=(
-  "admin-service"
-  "admin-ui"
-  "audit-service"
-  "auth-service"
-  "cart-service"
-  "chat-service"
-  "customer-ui"
-  "db-seeder"
-  "inventory-service"
-  "notification-service"
-  "order-processor-service"
-  "order-service"
-  "payment-service"
-  "product-service"
-  "review-service"
-  "user-service"
-  "web-bff"
+declare -A STEP_STATUS   # STEP_STATUS[name]="ok"|"failed"|"warn"
+declare -A STEP_TIMES    # STEP_TIMES[name]=seconds
+
+run_step() {
+  local name="$1"
+  local script="$2"
+  shift 2
+  local t=$SECONDS
+
+  if [ ! -f "$script" ]; then
+    warn "Skipping $name — $script not found"
+    STEP_STATUS["$name"]="warn"
+    STEP_TIMES["$name"]=0
+    return
+  fi
+
+  log "▶ $name"
+  chmod +x "$script" 2>/dev/null || true
+
+  # Pipe step output to its own log file as well as the main setup log
+  local step_log="$LOG_DIR/$(echo "$name" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | tr '.' '-').log"
+  if bash "$script" "$@" 2>&1 | stdbuf -oL tee "$step_log"; then
+    STEP_STATUS["$name"]="ok"
+    success "$name  ($(( SECONDS - t ))s)"
+  else
+    STEP_STATUS["$name"]="failed"
+    err "$name failed after $(( SECONDS - t ))s — see $step_log"
+  fi
+  STEP_TIMES["$name"]=$(( SECONDS - t ))
+}
+
+# =============================================================================
+# Steps — each is independent; a failure is logged but does not stop the rest
+# =============================================================================
+STEPS=(
+  "1. Clone repositories"
+  "2. Build services"
+  "3. Seed config / .env"
+  "4. Check infrastructure"
+  "5. Seed databases"
+  "6. Start services"
 )
 
-log "Cloning service repositories..."
-_step_start "Clone repositories"
-for repo in "${REPOS[@]}"; do
-  target="$WORKSPACES_DIR/$repo"
-  if [ -d "$target/.git" ]; then
-    warn "$repo already exists — skipping"
-  else
-    log "  Cloning $repo..."
-    git clone --depth 1 "https://github.com/$ORG/$repo.git" "$target" &
-  fi
-done
-wait
-# Re-run chmod after clone so newly pulled scripts are also executable
-find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-_step_done
-success "All repositories cloned"
+run_step "1. Clone repositories"   "$SCRIPTS_DIR/01-clone.sh"
+run_step "2. Build services"        "$SCRIPTS_DIR/02-build.sh"
+run_step "3. Seed config / .env"    "$SCRIPTS_DIR/03-env.sh"
+run_step "4. Check infrastructure"  "$SCRIPTS_DIR/04-infra.sh"
+run_step "5. Seed databases"        "$SCRIPTS_DIR/05-seed.sh"
+run_step "6. Start services"        "$SCRIPTS_DIR/06-start.sh"
 
 # =============================================================================
-# 2. Start shared infrastructure early so databases warm up in parallel
-#    with the install and build steps below.
+# Summary
 # =============================================================================
-# Infrastructure services (MongoDB, Redis, RabbitMQ, SQL Server, etc.) are
-# already running — Codespaces started them via the dockerComposeFile entries
-# in devcontainer.json before this script was invoked.
-success "Infrastructure containers already running (started by Codespaces)"
+TOTAL=$(( SECONDS - _SETUP_START ))
+PASS=0; FAIL=0; WARN=0
 
-# =============================================================================
-# 3. Install dependencies and build all services
-#    Delegates to build.sh which handles Node, TypeScript, Python, .NET, Java,
-#    and React — WORKSPACE_ROOT in that script resolves to /workspaces/.
-# =============================================================================
-log "Installing dependencies and building all services (this takes a few minutes)..."
-_step_start "Build all services"
-bash /workspaces/dev/build.sh --all
-_step_done
-success "All services built"
-
-# =============================================================================
-# 7. Copy .env files for every service (only on first run, never overwrite)
-# =============================================================================
-
-# dev infrastructure .env
-ENV_FILE="$WORKSPACES_DIR/dev/.env"
-if [ ! -f "$ENV_FILE" ]; then
-  cp "$WORKSPACES_DIR/dev/.env.example" "$ENV_FILE"
-  success "Created dev/.env from .env.example"
-else
-  warn "dev/.env already exists — not overwriting"
-fi
-
-# For each service, prefer .env.http (direct HTTP mode), fall back to .env.example
-# NOTE: order-service, payment-service, order-processor-service use JSON/YAML config — handled below
-log "Seeding service .env files..."
-_step_start "Seed .env files"
-ALL_SERVICES=(
-  "admin-service"
-  "audit-service"
-  "auth-service"
-  "cart-service"
-  "chat-service"
-  "inventory-service"
-  "notification-service"
-  "product-service"
-  "review-service"
-  "user-service"
-  "web-bff"
-)
-
-# After copying .env.http -> .env, replace localhost DB/broker hostnames with
-# Docker Compose service names. Inter-service URLs (localhost:8001 etc.) are
-# left as-is because all services run inside the same devcontainer.
-fix_codespace_hostnames() {
-  local f="$1"
-  [ -f "$f" ] || return
-  sed -i \
-    -e 's|localhost:27018|user-mongodb:27017|g' \
-    -e 's|localhost:27019|product-mongodb:27017|g' \
-    -e 's|localhost:27020|review-mongodb:27017|g' \
-    -e 's|POSTGRES_HOST=localhost|POSTGRES_HOST=audit-postgres|g' \
-    -e 's|POSTGRES_PORT=5434|POSTGRES_PORT=5432|g' \
-    -e 's|RABBITMQ_URL=amqp://admin:admin123@localhost|RABBITMQ_URL=amqp://admin:admin123@rabbitmq|g' \
-    -e 's|localhost:3306|inventory-mysql:3306|g' \
-    -e 's|REDIS_HOST=localhost|REDIS_HOST=redis|g' \
-    -e 's|SMTP_HOST=localhost|SMTP_HOST=mailpit|g' \
-    -e 's|SMTP_PORT=1025.*|SMTP_PORT=1025|g' \
-    "$f"
-}
-
-for svc in "${ALL_SERVICES[@]}"; do
-  target="$WORKSPACES_DIR/$svc/.env"
-  if [ -f "$target" ]; then
-    warn "$svc/.env already exists — not overwriting"
-  elif [ -f "$WORKSPACES_DIR/$svc/.env.http" ]; then
-    cp "$WORKSPACES_DIR/$svc/.env.http" "$target"
-    fix_codespace_hostnames "$target"
-    echo -e "  ${GREEN}✓${NC} $svc  (.env.http → .env, hostnames patched)"
-  elif [ -f "$WORKSPACES_DIR/$svc/.env.example" ]; then
-    cp "$WORKSPACES_DIR/$svc/.env.example" "$target"
-    fix_codespace_hostnames "$target"
-    echo -e "  ${GREEN}✓${NC} $svc  (.env.example → .env, hostnames patched)"
-  else
-    warn "$svc — no .env template found, skipping"
-  fi
-done
-_step_done
-success "Service .env files seeded"
-
-# =============================================================================
-# 6b. Write Codespace config for .NET and Java services
-#     These services use JSON/YAML config files (not .env).
-#     scripts/dev.sh in each repo copies the Development/dev variant before
-#     starting, so we write Codespace-correct versions here.
-# =============================================================================
-log "Writing Codespace config for .NET / Java services..."
-_step_start "Write .NET/Java configs"
-
-# --- order-service: appsettings.Development.json ---
-ORDER_SETTINGS="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Development.json"
-if [ -f "$ORDER_SETTINGS" ]; then
-  cat > "$ORDER_SETTINGS" << 'EOF'
-{
-  "SERVICE_INVOCATION_MODE": "http",
-  "MESSAGING_PROVIDER": "rabbitmq",
-  "Dapr": { "Enabled": false },
-  "RabbitMQ": {
-    "Host": "rabbitmq",
-    "Port": 5672,
-    "Username": "admin",
-    "Password": "admin123",
-    "VirtualHost": "/",
-    "ExchangeName": "xshopai.events"
-  },
-  "Jwt": {
-    "Secret": "8tDBDMcpxroHoHjXjk8xp/uAn8rzD4y8ZZremFkC4gI=",
-    "Issuer": "auth-service",
-    "Audience": "xshopai-platform"
-  },
-  "DATABASE_CONNECTION_STRING": "Server=order-sqlserver,1433;Database=order_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False",
-  "Tracing": {
-    "Exporter": "zipkin",
-    "ZipkinEndpoint": "http://zipkin:9411/api/v2/spans",
-    "ServiceName": "order-service"
-  }
-}
-EOF
-  echo -e "  ${GREEN}✓${NC} order-service  (appsettings.Development.json)"
-else
-  warn "order-service appsettings.Development.json not found — skipping"
-fi
-
-# --- payment-service: appsettings.Development.json ---
-PAYMENT_SETTINGS="$WORKSPACES_DIR/payment-service/PaymentService/appsettings.Development.json"
-if [ -f "$PAYMENT_SETTINGS" ]; then
-  cat > "$PAYMENT_SETTINGS" << 'EOF'
-{
-  "SERVICE_INVOCATION_MODE": "http",
-  "MESSAGING_PROVIDER": "rabbitmq",
-  "Dapr": { "Enabled": false },
-  "PaymentProviders": {
-    "DefaultProvider": "simulation",
-    "Simulation": { "IsEnabled": true, "AutoSuccess": true, "ProcessingDelayMs": 500 },
-    "Stripe": { "IsEnabled": false }
-  },
-  "RabbitMQ": {
-    "Host": "rabbitmq",
-    "Port": 5672,
-    "Username": "admin",
-    "Password": "admin123",
-    "VirtualHost": "/",
-    "ExchangeName": "xshopai.events"
-  },
-  "Jwt": {
-    "Key": "8tDBDMcpxroHoHjXjk8xp/uAn8rzD4y8ZZremFkC4gI=",
-    "Issuer": "auth-service",
-    "Audience": "xshopai-platform"
-  },
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=payment-sqlserver,1433;Database=payment_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False"
-  },
-  "Tracing": {
-    "Exporter": "zipkin",
-    "ZipkinEndpoint": "http://zipkin:9411/api/v2/spans",
-    "ServiceName": "payment-service"
-  }
-}
-EOF
-  echo -e "  ${GREEN}✓${NC} payment-service  (appsettings.Development.json)"
-else
-  warn "payment-service appsettings.Development.json not found — skipping"
-fi
-
-# --- order-processor-service: application-dev.yml ---
-# scripts/dev.sh copies application-dev.yml → application.yml (file doesn't
-# ship in the repo; we create it here for the Codespace)
-OPS_YML="$WORKSPACES_DIR/order-processor-service/src/main/resources/application-dev.yml"
-mkdir -p "$(dirname "$OPS_YML")"
-cat > "$OPS_YML" << 'EOF'
-server:
-  port: ${PORT:8007}
-
-service:
-  invocation:
-    mode: http
-
-messaging:
-  provider: rabbitmq
-
-rabbitmq:
-  host: rabbitmq
-  port: 5672
-  username: admin
-  password: admin123
-  virtual-host: /
-  exchange: order-processor-events
-  queue: order-processor-queue
-
-spring:
-  datasource:
-    url: jdbc:postgresql://order-processor-postgres:5432/order_processor_db
-    username: postgres
-    password: postgres
-
-logging:
-  level:
-    com.xshopai.orderprocessor: INFO
-EOF
-echo -e "  ${GREEN}✓${NC} order-processor-service  (application-dev.yml)"
-_step_done
-success "Non-.env service configs written"
-
-# =============================================================================
-# 8. Start shared infrastructure (databases, RabbitMQ, Redis, etc.)
-# =============================================================================
-# (already started in step 2 — skipped here)
-
-# =============================================================================
-# 9. Seed databases with sample data via db-seeder
-#    Infrastructure has been running since step 2 (~10 min) so all DBs
-#    are ready — no sleep needed.
-# =============================================================================
-log "Installing db-seeder Python dependencies..."
-_step_start "Install db-seeder deps"
-pip install -q -r "$WORKSPACES_DIR/db-seeder/seed/requirements.txt"
-_step_done
-success "db-seeder dependencies installed"
-
-# Write seed/.env pointing to Docker Compose service hostnames (internal network)
-log "Writing db-seeder .env..."
-cat > "$WORKSPACES_DIR/db-seeder/seed/.env" << 'EOF'
-# MongoDB (internal Docker service hostnames + port 27017)
-USER_MONGODB_URI=mongodb://admin:admin123@user-mongodb:27017/user_service_db?authSource=admin
-PRODUCT_MONGODB_URI=mongodb://admin:admin123@product-mongodb:27017/product_service_db?authSource=admin
-REVIEW_MONGODB_URI=mongodb://admin:admin123@review-mongodb:27017/review_service_db?authSource=admin
-
-# PostgreSQL — audit-service
-POSTGRES_HOST=audit-postgres
-POSTGRES_PORT=5432
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=admin123
-POSTGRES_DB=audit_service_db
-
-# MySQL — inventory-service
-MYSQL_SERVER_CONNECTION=mysql+pymysql://admin:admin123@inventory-mysql:3306
-INVENTORY_DB_NAME=inventory_service_db
-
-# SQL Server — order-service
-ORDER_SQLSERVER_HOST=order-sqlserver
-ORDER_SQLSERVER_PORT=1433
-ORDER_SQLSERVER_USER=sa
-ORDER_SQLSERVER_PASSWORD=Admin123!
-ORDER_SQLSERVER_DB=order_service_db
-
-# SQL Server — payment-service
-PAYMENT_SQLSERVER_HOST=payment-sqlserver
-PAYMENT_SQLSERVER_PORT=1433
-PAYMENT_SQLSERVER_USER=sa
-PAYMENT_SQLSERVER_PASSWORD=Admin123!
-PAYMENT_SQLSERVER_DB=payment_service_db
-
-# Redis — cart-service
-REDIS_HOST=redis
-REDIS_PORT=6379
-REDIS_PASSWORD=redis_dev_pass_123
-EOF
-success "db-seeder .env written"
-
-log "Running db-seeder..."
-_step_start "Seed databases"
-cd "$WORKSPACES_DIR/db-seeder/seed"
-python seed.py && _step_done && success "Database seeding complete" || { warn "db-seeder exited with errors — check output above"; }
-
-# =============================================================================
-# 10. Start all services in dev mode
-# =============================================================================
-log "Starting all services in dev mode..."
-_step_start "Start services"
-cd "$WORKSPACES_DIR/dev"
-bash ./dev.sh
-_step_done
-success "All services started"
-
-# =============================================================================
-# Done
-# =============================================================================
 echo ""
-echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║  xshopai platform is ready!                            ║${NC}"
-echo -e "${GREEN}╠══════════════════════════════════════════════════════════╣${NC}"
-echo -e "${GREEN}║  Infrastructure:  running via Docker Compose            ║${NC}"
-echo -e "${GREEN}║  Code:            all repos cloned to /workspaces/      ║${NC}"
-echo -e "${GREEN}║  Databases:       seeded with sample data               ║${NC}"
-echo -e "${GREEN}║  Services:        all running in dev mode               ║${NC}"
-echo -e "${GREEN}╠══════════════════════════════════════════════════════════╣${NC}"
-echo -e "${GREEN}║  Stop all services:  cd /workspaces/dev && ./dev.sh --stop ║${NC}"
-echo -e "${GREEN}╠══════════════════════════════════════════════════════════╣${NC}"
-echo -e "${GREEN}║  Log file:  /workspaces/dev/logs/setup.log              ║${NC}"
-echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
+echo -e "${CYAN}  ═══════════════════════════════════════════════════${NC}"
+echo -e "${CYAN}  Setup complete in ${TOTAL}s${NC}"
+echo -e "${CYAN}  ═══════════════════════════════════════════════════${NC}"
+
+for step in "${STEPS[@]}"; do
+  status="${STEP_STATUS["$step"]:-unknown}"
+  t="${STEP_TIMES["$step"]:-?}s"
+  case "$status" in
+    ok)      echo -e "  ${GREEN}✓${NC} $step  ($t)"; (( PASS++ )) || true ;;
+    failed)  echo -e "  ${RED}✗${NC} $step  ($t)"; (( FAIL++ )) || true ;;
+    warn)    echo -e "  ${YELLOW}⚠${NC} $step  (skipped)"; (( WARN++ )) || true ;;
+    *)       echo    "  ? $step" ;;
+  esac
+done
+
 echo ""
-# Open the multi-root workspace so all service folders appear in the Explorer.
-# Runs at the END of setup so all repo folders already exist.
-# -r reuses the current VS Code window instead of opening a new one.
+if [ $FAIL -gt 0 ]; then
+  echo -e "${YELLOW}  ⚠ $FAIL step(s) had errors — check logs in $LOG_DIR/${NC}"
+else
+  echo -e "${GREEN}  All steps passed!${NC}"
+fi
+echo -e "  Log file: $LOG_FILE"
+echo -e "${CYAN}  ═══════════════════════════════════════════════════${NC}"
+echo ""
+
+# Open the multi-root workspace (fallback if workspaceFile in devcontainer.json
+# did not trigger — harmless if it already opened)
 code -r /workspaces/dev/xshopai.code-workspace 2>/dev/null || true
-echo ""
-echo "=== setup.sh completed in $(( SECONDS - _SETUP_START ))s at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
+
+echo "=== setup.sh completed in ${TOTAL}s ==="
