@@ -20,7 +20,9 @@ mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/setup.log"
 # Redirect all stdout+stderr through tee so both the terminal and the log file
 # receive every line for the rest of this script.
-exec > >(tee -a "$LOG_FILE") 2>&1
+# Use stdbuf -oL to force line-buffered output so tail -f sees every line
+# immediately rather than waiting for the pipe buffer to fill.
+exec > >(stdbuf -oL tee -a "$LOG_FILE") 2>&1
 echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
 _SETUP_START=$SECONDS
 
