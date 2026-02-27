@@ -5,7 +5,7 @@
 # - Node/Python/TypeScript services: .env.http → .env (or .env.example)
 # - .NET services: writes appsettings.Development.json
 # - Java service: writes application-dev.yml
-# Idempotent: never overwrites existing files.
+# Idempotent: copies only if .env is missing, but ALWAYS patches hostnames.
 # =============================================================================
 
 WORKSPACES_DIR="/workspaces"
@@ -23,6 +23,9 @@ err()     { echo -e "${RED}[env $(_ts)]${NC} ✗ $1"; }
 # container_name DNS works from ANY container on the same network;
 # Compose service-name aliases only work within the same Compose project.
 # Inter-service HTTP URLs (localhost:800x) are intentionally left as-is.
+#
+# IMPORTANT: sed patterns are idempotent — safe to run on an already-patched
+# file (dev-user-mongodb:27017 does not match localhost:27018, so it's a no-op).
 # -----------------------------------------------------------------------------
 patch_hostnames() {
   local f="$1"
@@ -46,7 +49,10 @@ seed_env() {
   local target="$WORKSPACES_DIR/$svc/.env"
 
   if [ -f "$target" ]; then
-    warn "$svc/.env already exists — skipping"
+    # File already exists (committed in repo with localhost hostnames).
+    # Always patch so infra connections resolve correctly inside the container.
+    patch_hostnames "$target"
+    success "$svc  (.env exists — hostnames patched)"
     return
   fi
 
