@@ -168,8 +168,11 @@ success "Image ready"
 #   - docker socket (Docker-outside-of-Docker)
 #   - xshopai-dev-network (same network as infra containers)
 
+CONTAINER_NAME="xshopai-dev-test"
+
 DOCKER_RUN=(
   docker run --rm -it
+  --name "$CONTAINER_NAME"
   --network "$NETWORK"
   # Repo volume — persists cloned repos between test runs
   -v "${VOL_WORKSPACES}:/workspaces"
@@ -273,9 +276,14 @@ else
 fi
 
 # ===========================================================================
-# Run
+# Run — stop any stale container first (prevents "port already allocated")
 # ===========================================================================
 echo ""
+if docker inspect "$CONTAINER_NAME" > /dev/null 2>&1; then
+  warn "Stopping stale container '$CONTAINER_NAME'..."
+  docker rm -f "$CONTAINER_NAME" > /dev/null 2>&1 || true
+  success "Stale container removed"
+fi
 # MSYS_NO_PATHCONV=1 prevents Git Bash (MSYS2) from converting absolute paths
 # like /workspaces/... and /var/run/... into Windows paths (C:/Program Files/Git/...)
 MSYS_NO_PATHCONV=1 "${DOCKER_RUN[@]}"
