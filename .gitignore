@@ -1,0 +1,5 @@
+# Runtime files generated during local/Codespace development
+.env
+.service-pids
+logs/
+*.log
