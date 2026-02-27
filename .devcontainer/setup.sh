@@ -12,17 +12,8 @@ set -e
 WORKSPACES_DIR="/workspaces"
 ORG="xshopai"
 
-# Fix execute permissions upfront — Windows checkouts strip the +x bit.
-# Run this before anything else so dev.sh / scripts/dev.sh are always runnable.
-find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-
-# Fix NuGet directory permissions — the named cache volume is created by Docker
-# as root, which makes /home/codespace/.nuget unreadable by the codespace user.
-mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages
-chmod -R 777 /home/codespace/.nuget 2>/dev/null || true
-
 # =============================================================================
-# Logging — tee everything to a persistent log file
+# Logging — set up FIRST so every subsequent failure is captured
 # =============================================================================
 LOG_DIR="$WORKSPACES_DIR/dev/logs"
 mkdir -p "$LOG_DIR"
@@ -53,6 +44,14 @@ trap 'err "FAILED at line $LINENO: $BASH_COMMAND (exit $?)"; err "Full log: $LOG
 # Helper: run a named step, print elapsed time when done
 _step_start() { _STEP_NAME="$1"; _STEP_T=$SECONDS; log "▶ $_STEP_NAME"; }
 _step_done()  { success "$_STEP_NAME  ($(( SECONDS - _STEP_T ))s)"; }
+
+# Fix execute permissions — Windows checkouts strip the +x bit.
+find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+
+# Fix NuGet directory permissions — named cache volume is created by Docker as
+# root, making /home/codespace/.nuget unreadable by the codespace user.
+mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages 2>/dev/null || true
+chmod -R 777 /home/codespace/.nuget 2>/dev/null || true
 
 echo -e "${CYAN}"
 echo "  ╔══════════════════════════════════════════╗"
