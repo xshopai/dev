@@ -44,6 +44,28 @@ patch_hostnames() {
     "$f"
 }
 
+# Patch localhost hostnames in .NET appsettings JSON files.
+patch_appsettings() {
+  local f="$1"
+  [ -f "$f" ] || return
+  sed -i \
+    -e 's|"Host": "localhost"|"Host": "dev-rabbitmq"|g' \
+    -e 's|Server=localhost,1434;Database=order_service_db|Server=dev-order-sqlserver,1433;Database=order_service_db|g' \
+    -e 's|Server=localhost,1434;Database=payment_service_db|Server=dev-payment-sqlserver,1433;Database=payment_service_db|g' \
+    -e 's|http://localhost:9411|http://dev-zipkin:9411|g' \
+    "$f"
+}
+
+# Patch localhost hostnames in Java Spring Boot YAML config files.
+patch_java_yml() {
+  local f="$1"
+  [ -f "$f" ] || return
+  sed -i \
+    -e 's|  host: localhost|  host: dev-rabbitmq|g' \
+    -e 's|jdbc:postgresql://localhost:5435/order_processor_db|jdbc:postgresql://dev-order-processor-postgres:5432/order_processor_db|g' \
+    "$f"
+}
+
 seed_env() {
   local svc="$1"
   local target="$WORKSPACES_DIR/$svc/.env"
@@ -104,115 +126,38 @@ done
 # 3. order-service — appsettings.Development.json
 # =============================================================================
 log "Writing .NET / Java configs..."
-ORDER_SETTINGS="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Development.json"
-if [ ! -f "$ORDER_SETTINGS" ]; then
-  warn "order-service appsettings.Development.json not found"
+ORDER_HTTP="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Http.json"
+ORDER_DEV="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Development.json"
+if [ -f "$ORDER_HTTP" ]; then
+  patch_appsettings "$ORDER_HTTP"
+  cp "$ORDER_HTTP" "$ORDER_DEV"
+  success "order-service  (appsettings.Http.json patched → Development.json)"
 else
-  cat > "$ORDER_SETTINGS" << 'EOF'
-{
-  "SERVICE_INVOCATION_MODE": "http",
-  "MESSAGING_PROVIDER": "rabbitmq",
-  "Dapr": { "Enabled": false },
-  "RabbitMQ": {
-    "Host": "dev-rabbitmq",
-    "Port": 5672,
-    "Username": "admin",
-    "Password": "admin123",
-    "VirtualHost": "/",
-    "ExchangeName": "xshopai.events"
-  },
-  "Jwt": {
-    "Secret": "8tDBDMcpxroHoHjXjk8xp/uAn8rzD4y8ZZremFkC4gI=",
-    "Issuer": "auth-service",
-    "Audience": "xshopai-platform"
-  },
-  "DATABASE_CONNECTION_STRING": "Server=dev-order-sqlserver,1433;Database=order_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False",
-  "Tracing": {
-    "Exporter": "zipkin",
-    "ZipkinEndpoint": "http://dev-zipkin:9411/api/v2/spans",
-    "ServiceName": "order-service"
-  }
-}
-EOF
-  success "order-service  (appsettings.Development.json)"
+  warn "order-service  appsettings.Http.json not found"
 fi
 
 # =============================================================================
 # 4. payment-service — appsettings.Development.json
 # =============================================================================
-PAYMENT_SETTINGS="$WORKSPACES_DIR/payment-service/PaymentService/appsettings.Development.json"
-if [ ! -f "$PAYMENT_SETTINGS" ]; then
-  warn "payment-service appsettings.Development.json not found"
+PAYMENT_HTTP="$WORKSPACES_DIR/payment-service/PaymentService/appsettings.Http.json"
+PAYMENT_DEV="$WORKSPACES_DIR/payment-service/PaymentService/appsettings.Development.json"
+if [ -f "$PAYMENT_HTTP" ]; then
+  patch_appsettings "$PAYMENT_HTTP"
+  cp "$PAYMENT_HTTP" "$PAYMENT_DEV"
+  success "payment-service  (appsettings.Http.json patched → Development.json)"
 else
-  cat > "$PAYMENT_SETTINGS" << 'EOF'
-{
-  "SERVICE_INVOCATION_MODE": "http",
-  "MESSAGING_PROVIDER": "rabbitmq",
-  "Dapr": { "Enabled": false },
-  "PaymentProviders": {
-    "DefaultProvider": "simulation",
-    "Simulation": { "IsEnabled": true, "AutoSuccess": true, "ProcessingDelayMs": 500 },
-    "Stripe": { "IsEnabled": false }
-  },
-  "RabbitMQ": {
-    "Host": "dev-rabbitmq",
-    "Port": 5672,
-    "Username": "admin",
-    "Password": "admin123",
-    "VirtualHost": "/",
-    "ExchangeName": "xshopai.events"
-  },
-  "Jwt": {
-    "Key": "8tDBDMcpxroHoHjXjk8xp/uAn8rzD4y8ZZremFkC4gI=",
-    "Issuer": "auth-service",
-    "Audience": "xshopai-platform"
-  },
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=dev-payment-sqlserver,1433;Database=payment_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False"
-  },
-  "Tracing": {
-    "Exporter": "zipkin",
-    "ZipkinEndpoint": "http://dev-zipkin:9411/api/v2/spans",
-    "ServiceName": "payment-service"
-  }
-}
-EOF
-  success "payment-service  (appsettings.Development.json)"
+  warn "payment-service  appsettings.Http.json not found"
 fi
 
 # =============================================================================
 # 5. order-processor-service — application-dev.yml
 # =============================================================================
-OPS_YML="$WORKSPACES_DIR/order-processor-service/src/main/resources/application-dev.yml"
-mkdir -p "$(dirname "$OPS_YML")"
-cat > "$OPS_YML" << 'EOF'
-server:
-  port: ${PORT:8007}
-
-service:
-  invocation:
-    mode: http
-
-messaging:
-  provider: rabbitmq
-
-rabbitmq:
-  host: dev-rabbitmq
-  port: 5672
-  username: admin
-  password: admin123
-  virtual-host: /
-  exchange: order-processor-events
-  queue: order-processor-queue
-
-spring:
-  datasource:
-    url: jdbc:postgresql://dev-order-processor-postgres:5432/order_processor_db
-    username: postgres
-    password: postgres
-
-logging:
-  level:
-    com.xshopai.orderprocessor: INFO
-EOF
-success "order-processor-service  (application-dev.yml)"
+OPS_HTTP="$WORKSPACES_DIR/order-processor-service/src/main/resources/application-http.yml"
+OPS_DEV="$WORKSPACES_DIR/order-processor-service/src/main/resources/application-dev.yml"
+if [ -f "$OPS_HTTP" ]; then
+  patch_java_yml "$OPS_HTTP"
+  cp "$OPS_HTTP" "$OPS_DEV"
+  success "order-processor-service  (application-http.yml patched → application-dev.yml)"
+else
+  warn "order-processor-service  application-http.yml not found"
+fi
