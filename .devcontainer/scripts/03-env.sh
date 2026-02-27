@@ -117,6 +117,7 @@ ENV_SERVICES=(
   "inventory-service" "notification-service"
   "product-service" "review-service"
   "user-service" "web-bff"
+  "admin-ui" "customer-ui"
 )
 for svc in "${ENV_SERVICES[@]}"; do
   seed_env "$svc"
