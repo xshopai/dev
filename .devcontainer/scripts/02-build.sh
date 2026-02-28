@@ -88,7 +88,9 @@ for svc in "${NODE_SERVICES[@]}"; do
 done
 
 for svc in "${TS_SERVICES[@]}"; do
-  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit --cache /tmp/npm-ci-${svc} && npm run build 2>&1" &
+  # npm run build (tsc) omitted: dev mode uses 'npx tsx watch' which compiles
+  # on the fly from source — the dist/ folder is never used in development.
+  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit --cache /tmp/npm-ci-${svc} 2>&1" &
 done
 
 for svc in "${UI_SERVICES[@]}"; do
