@@ -23,7 +23,9 @@ services:
       - devcontainer-npm-cache:/home/codespace/.npm
       - devcontainer-m2-cache:/home/codespace/.m2
       - devcontainer-pip-cache:/home/codespace/.cache/pip
-      - devcontainer-nuget-cache:/home/codespace/.nuget/packages
+      # Mount at .nuget (not .nuget/packages) so Docker doesn't create the parent
+      # directory as root, which would block .nuget/NuGet/NuGet.Config creation.
+      - devcontainer-nuget-cache:/home/codespace/.nuget
 
 # Named volumes for dependency caches
 volumes:

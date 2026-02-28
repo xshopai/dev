@@ -65,6 +65,10 @@
   //   AZURE_OPENAI_ENDPOINT                  - for chat-service (optional)
   //   AZURE_COMMUNICATION_CONNECTION_STRING  - for notification-service (optional)
   "remoteEnv": {
+    // ── .NET NuGet ───────────────────────────────────────────────────────────
+    // Explicit path keeps packages inside the named volume mounted at .nuget
+    "NUGET_PACKAGES": "/home/codespace/.nuget/packages",
+
     // ── MongoDB ──────────────────────────────────────────────────────────────
     "MONGODB_URI": "mongodb://admin:admin123@user-mongodb:27017/user_service_db?authSource=admin",
     "USER_MONGODB_URL": "mongodb://admin:admin123@user-mongodb:27017/user_service_db?authSource=admin",

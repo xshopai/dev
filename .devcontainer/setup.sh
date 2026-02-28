@@ -18,6 +18,12 @@ SCRIPTS_DIR="$WORKSPACES_DIR/dev/.devcontainer/scripts"
 LOG_DIR="$WORKSPACES_DIR/dev/logs"
 mkdir -p "$LOG_DIR"
 
+# The NuGet named volume is mounted at /home/codespace/.nuget. On first run the
+# directory may be owned by root (Docker volume initialisation). Fix it upfront
+# so dotnet restore and the C# DevKit extension can write NuGet.Config freely.
+sudo chown -R codespace:codespace /home/codespace/.nuget 2>/dev/null || true
+mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages
+
 LOG_FILE="$LOG_DIR/setup.log"
 exec > >(stdbuf -oL tee -a "$LOG_FILE") 2>&1
 echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
