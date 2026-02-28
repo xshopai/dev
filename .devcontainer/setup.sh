@@ -173,8 +173,8 @@ echo -e "  Log file: $LOG_FILE"
 echo -e "${CYAN}  ═══════════════════════════════════════════════════${NC}"
 echo ""
 
-# Open the multi-root workspace (fallback if workspaceFile in devcontainer.json
-# did not trigger — harmless if it already opened)
-code -r /workspaces/dev/xshopai.code-workspace 2>/dev/null || true
+# NOTE: workspace reload is handled by postAttachCommand in devcontainer.json
+# ('code -r' is unreliable here — VS Code server may not be ready yet when
+# postCreateCommand runs).
 
 echo "=== setup.sh completed in ${TOTAL}s ===" | tee -a "$LOG_FILE"

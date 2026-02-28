@@ -22,6 +22,12 @@
   // Runs once after the container is first created.
   "postCreateCommand": "bash /workspaces/dev/.devcontainer/setup.sh",
 
+  // Open the multi-root workspace every time VS Code attaches to this container.
+  // postAttachCommand runs after the VS Code server is fully connected, making
+  // 'code -r' reliable. postCreateCommand is too early — the server isn't ready
+  // to accept CLI commands when setup.sh first runs.
+  "postAttachCommand": "code -r /workspaces/dev/xshopai.code-workspace",
+
   // Forward all service and infra UI ports so they are accessible
   // from the developer's browser via the Codespace URL.
   "forwardPorts": [
