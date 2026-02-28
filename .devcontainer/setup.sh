@@ -36,7 +36,9 @@ mkdir -p \
   /home/codespace/.cache/pip
 
 LOG_FILE="$LOG_DIR/setup.log"
-exec > >(stdbuf -oL tee -a "$LOG_FILE") 2>&1
+# tee keeps colours in the terminal; the process substitution strips ANSI before
+# appending to the log file so it's readable as plain text in VS Code / cat.
+exec > >(stdbuf -oL tee >(sed 's/\x1b\[[0-9;]*[mGKHF]//g' >> "$LOG_FILE")) 2>&1
 echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
 _SETUP_START=$SECONDS
 

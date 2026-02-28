@@ -80,16 +80,19 @@ NODE_SERVICES=("auth-service" "user-service" "admin-service" "audit-service" "re
 TS_SERVICES=("notification-service" "chat-service" "web-bff" "cart-service")
 UI_SERVICES=("admin-ui" "customer-ui")
 
+# Each parallel npm ci gets its own isolated cache directory under /tmp to
+# prevent EEXIST race conditions when multiple processes write to the shared
+# /home/codespace/.npm/_cacache/tmp simultaneously.
 for svc in "${NODE_SERVICES[@]}"; do
-  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit 2>&1" &
+  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit --cache /tmp/npm-ci-${svc} 2>&1" &
 done
 
 for svc in "${TS_SERVICES[@]}"; do
-  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit && npm run build 2>&1" &
+  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit --cache /tmp/npm-ci-${svc} && npm run build 2>&1" &
 done
 
 for svc in "${UI_SERVICES[@]}"; do
-  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit 2>&1" &
+  build_service "$svc" "$WORKSPACES_DIR/$svc" "npm ci --prefer-offline --no-audit --cache /tmp/npm-ci-${svc} 2>&1" &
 done
 
 wait
