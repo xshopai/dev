@@ -2,8 +2,9 @@
 # =============================================================================
 # 00-prerequisites.sh — Verify all required tools are installed
 # =============================================================================
-# Checks for Docker, Node.js, Python, Java, .NET SDK, and Git.
-# Exits 1 if any are missing.
+# Checks for Docker (+ daemon running), Node.js, Python, Java, Maven,
+# .NET SDK, and Git.  ALL are hard requirements — the script exits 1
+# if any are missing.
 # =============================================================================
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; RED='\033[0;31m'; NC='\033[0m'
@@ -15,7 +16,7 @@ err()     { echo -e "${RED}[prereq $(_ts)]${NC} ✗ $1"; }
 
 MISSING=()
 
-# Docker
+# ---- Docker CLI ----
 if command -v docker &>/dev/null; then
   success "Docker  $(docker --version 2>/dev/null | head -1)"
 else
@@ -23,7 +24,59 @@ else
   MISSING+=("Docker — https://docs.docker.com/get-docker/")
 fi
 
-# Docker Compose (v2 plugin or standalone)
+# ---- Docker daemon (auto-start Docker Desktop if installed but not running) ----
+if command -v docker &>/dev/null; then
+  if ! docker info &>/dev/null; then
+    warn "Docker daemon is not running — attempting to start Docker Desktop..."
+
+    STARTED=false
+    case "$(uname -s)" in
+      Darwin)
+        if [ -d "/Applications/Docker.app" ]; then
+          open -a Docker
+          STARTED=true
+        fi
+        ;;
+      Linux)
+        if command -v systemctl &>/dev/null && systemctl list-unit-files docker.service &>/dev/null; then
+          sudo systemctl start docker 2>/dev/null && STARTED=true
+        fi
+        ;;
+      MINGW*|MSYS*|CYGWIN*)
+        # Windows Git Bash — try starting Docker Desktop
+        DOCKER_EXE="/c/Program Files/Docker/Docker/Docker Desktop.exe"
+        if [ -f "$DOCKER_EXE" ]; then
+          "$DOCKER_EXE" &
+          STARTED=true
+        fi
+        ;;
+    esac
+
+    if [ "$STARTED" = true ]; then
+      log "Waiting for Docker daemon to start (up to 60s)..."
+      ELAPSED=0
+      while ! docker info &>/dev/null; do
+        sleep 2
+        (( ELAPSED += 2 )) || true
+        if [ "$ELAPSED" -ge 60 ]; then
+          err "Docker daemon did not start within 60s"
+          MISSING+=("Docker daemon — start Docker Desktop manually and re-run")
+          break
+        fi
+      done
+      if docker info &>/dev/null; then
+        success "Docker daemon started (took ${ELAPSED}s)"
+      fi
+    else
+      err "Docker daemon is not running and Docker Desktop was not found to auto-start"
+      MISSING+=("Docker daemon — install and start Docker Desktop: https://docs.docker.com/get-docker/")
+    fi
+  else
+    success "Docker daemon running"
+  fi
+fi
+
+# ---- Docker Compose (v2 plugin or standalone) ----
 if docker compose version &>/dev/null 2>&1; then
   success "Docker Compose  $(docker compose version --short 2>/dev/null)"
 elif command -v docker-compose &>/dev/null; then
@@ -78,11 +131,11 @@ else
   MISSING+=("Java 17+ — https://adoptium.net/")
 fi
 
-# Maven (for order-processor-service)
+# Maven (required for order-processor-service — Java/Spring Boot)
 if command -v mvn &>/dev/null; then
   success "Maven  $(mvn --version 2>/dev/null | head -1)"
 else
-  warn "Maven not found — needed for order-processor-service"
+  err "Maven not found — required for order-processor-service"
   MISSING+=("Maven — https://maven.apache.org/download.cgi")
 fi
 
