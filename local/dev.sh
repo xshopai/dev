@@ -1,9 +1,14 @@
 #!/bin/bash
 # =============================================================================
-# xshopai - Run All Services Script (Development)
+# xshopai - Run All Services Script (Local Development)
 # =============================================================================
 # This script starts all microservices, BFF, and UIs in background processes
-# with logs written to the logs/ directory.
+# with logs written to the dev/logs/ directory.
+#
+# Prerequisites:
+#   - Infrastructure running: docker compose -f ../docker-compose.yml up -d
+#   - Services built: ./build.sh --all
+#   - .env files seeded: ./setup.sh (or manually)
 #
 # Usage:
 #   ./dev.sh          - Start all services in background (logs to files)
@@ -13,8 +18,9 @@ set -e
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE_ROOT="$(dirname "$SCRIPT_DIR")"
-LOG_DIR="$SCRIPT_DIR/logs"
+DEV_ROOT="$(dirname "$SCRIPT_DIR")"
+WORKSPACE_ROOT="$(dirname "$DEV_ROOT")"
+LOG_DIR="$DEV_ROOT/logs"
 PID_FILE="$SCRIPT_DIR/.service-pids"
 
 # Colors for output
@@ -58,6 +64,7 @@ fi
 
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}xshopai - Starting All Services${NC}"
+echo -e "${BLUE}  (Local Development)${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 

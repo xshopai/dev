@@ -148,8 +148,8 @@ echo ""
 
 # Getting started instructions
 echo -e "${CYAN}  Getting started:${NC}"
-echo -e "  ${WHITE}Start all services:${NC}   cd /workspaces/dev && ./dev.sh"
-echo -e "  ${WHITE}Stop all services:${NC}    cd /workspaces/dev && ./dev.sh --stop"
+echo -e "  ${WHITE}Start all services:${NC}   cd /workspaces/dev/.devcontainer && ./dev.sh"
+echo -e "  ${WHITE}Stop all services:${NC}    cd /workspaces/dev/.devcontainer && ./dev.sh --stop"
 echo -e "  ${WHITE}View service logs:${NC}    tail -f /workspaces/dev/logs/<service>.log"
 echo -e "  ${WHITE}Infrastructure:${NC}       docker compose -f /workspaces/dev/docker-compose.yml ps"
 echo ""

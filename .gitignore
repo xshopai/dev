@@ -3,3 +3,7 @@
 .service-pids
 logs/
 *.log
+
+# PID files in sub-folders
+local/.service-pids
+.devcontainer/.service-pids

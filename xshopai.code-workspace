@@ -94,7 +94,7 @@
       {
         "label": "Start All Services",
         "type": "shell",
-        "command": "cd /workspaces/dev && ./dev.sh",
+        "command": "cd /workspaces/dev/.devcontainer && ./dev.sh",
         "presentation": {
           "reveal": "always",
           "focus": true,
@@ -106,7 +106,7 @@
       {
         "label": "Stop All Services",
         "type": "shell",
-        "command": "cd /workspaces/dev && ./dev.sh --stop",
+        "command": "cd /workspaces/dev/.devcontainer && ./dev.sh --stop",
         "presentation": {
           "reveal": "always",
           "focus": true,
