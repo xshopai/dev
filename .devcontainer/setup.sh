@@ -120,7 +120,25 @@ run_step "2. Build services"        "$SCRIPTS_DIR/02-build.sh"
 run_step "3. Seed config / .env"    "$SCRIPTS_DIR/03-env.sh"
 run_step "4. Check infrastructure"  "$SCRIPTS_DIR/04-infra.sh"
 run_step "5. Seed databases"        "$SCRIPTS_DIR/05-seed.sh"
-run_step "6. Start services"        "$SCRIPTS_DIR/06-start.sh"
+
+# Step 6 MUST NOT go through run_step (which pipes via tee).
+# dev.sh starts 16 long-running background servers. Those servers are forked
+# while dev.sh's bash process still has the tee pipe write-end as fd 1.
+# Even though each service redirects to its own log, the pipe write-end is
+# inherited at fork time and tee never sees EOF → setup.sh hangs forever.
+# Fix: bypass the pipe entirely — redirect output directly to the log file.
+_start_name="6. Start services"
+_start_log="$LOG_DIR/6--start-services.log"
+_start_t=$SECONDS
+log "▶ $_start_name"
+if bash "$SCRIPTS_DIR/06-start.sh" >> "$_start_log" 2>&1; then
+  STEP_STATUS["$_start_name"]="ok"
+  success "$_start_name  ($(( SECONDS - _start_t ))s)"
+else
+  STEP_STATUS["$_start_name"]="failed"
+  err "$_start_name failed after $(( SECONDS - _start_t ))s — see $_start_log"
+fi
+STEP_TIMES["$_start_name"]=$(( SECONDS - _start_t ))
 
 # =============================================================================
 # Summary
