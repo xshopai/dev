@@ -85,13 +85,14 @@ run_step() {
   log "▶ $name"
   chmod +x "$script" 2>/dev/null || true
 
-  # Pipe step output to its own log file AND the terminal.
-  # Plain tee only — no nested >(sed ...) process substitution.
-  # Nested process substitution causes setup.sh to hang: background services
-  # started by dev.sh inherit the pipe's write-end, so tee never sees EOF.
-  # ANSI codes in step log files are acceptable (VS Code renders them).
+  # Pipe step output to both the terminal AND a stripped log file.
+  # Nested process substitution >(sed ...) is safe here: run_step is only
+  # called for steps 1-5 which are fully synchronous (no background servers).
+  # When the script exits, tee sees EOF and the sed subshell drains cleanly.
+  # Step 6 bypasses run_step entirely (direct >> redirect) to avoid the known
+  # hang where background servers inherit the pipe write-end indefinitely.
   local step_log="$LOG_DIR/$(echo "$name" | tr ' /\\' '---' | tr '[:upper:]' '[:lower:]' | tr '.' '-').log"
-  bash "$script" "$@" 2>&1 | tee "$step_log"
+  bash "$script" "$@" 2>&1 | tee >(sed 's/\x1b\[[0-9;]*[mGKHFJsulABCDEF]//g; s/\x1b\[[\?][0-9]*[lh]//g' > "$step_log")
   local rc=${PIPESTATUS[0]}
   if [ $rc -eq 0 ]; then
     STEP_STATUS["$name"]="ok"
