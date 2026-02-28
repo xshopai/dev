@@ -18,11 +18,22 @@ SCRIPTS_DIR="$WORKSPACES_DIR/dev/.devcontainer/scripts"
 LOG_DIR="$WORKSPACES_DIR/dev/logs"
 mkdir -p "$LOG_DIR"
 
-# The NuGet named volume is mounted at /home/codespace/.nuget. On first run the
-# directory may be owned by root (Docker volume initialisation). Fix it upfront
-# so dotnet restore and the C# DevKit extension can write NuGet.Config freely.
-sudo chown -R codespace:codespace /home/codespace/.nuget 2>/dev/null || true
-mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages
+# Named-volume cache directories may be owned by root on first mount (Docker
+# creates the mount-point directory as root if it doesn't exist in the image).
+# Fix ownership up-front before any build step runs. sudo is always available
+# in devcontainers/universal.
+sudo chown -R codespace:codespace \
+  /home/codespace/.nuget \
+  /home/codespace/.npm \
+  /home/codespace/.m2 \
+  /home/codespace/.cache \
+  2>/dev/null || true
+mkdir -p \
+  /home/codespace/.nuget/NuGet \
+  /home/codespace/.nuget/packages \
+  /home/codespace/.npm \
+  /home/codespace/.m2 \
+  /home/codespace/.cache/pip
 
 LOG_FILE="$LOG_DIR/setup.log"
 exec > >(stdbuf -oL tee -a "$LOG_FILE") 2>&1
@@ -41,10 +52,6 @@ err()     { echo -e "${RED}[setup $(_ts)]${NC} ✗ $1"; }
 
 # Fix execute permissions (Windows checkouts strip +x)
 find "$WORKSPACES_DIR/dev" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-
-# Fix NuGet directory permissions (named volume created as root)
-mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages 2>/dev/null || true
-chmod -R 777 /home/codespace/.nuget 2>/dev/null || true
 
 echo -e "${CYAN}"
 echo "  ╔══════════════════════════════════════════╗"
@@ -74,9 +81,15 @@ run_step() {
   log "▶ $name"
   chmod +x "$script" 2>/dev/null || true
 
-  # Pipe step output to its own log file as well as the main setup log
+  # Pipe step output to its own log file as well as the main setup log.
+  # - tee writes to terminal with colours intact
+  # - process substitution strips ANSI escape codes before writing to the file
+  #   so the log file is readable as plain text in VS Code / cat
+  # - PIPESTATUS[0] captures the exit code of the bash script, not tee
   local step_log="$LOG_DIR/$(echo "$name" | tr ' /\\' '---' | tr '[:upper:]' '[:lower:]' | tr '.' '-').log"
-  if bash "$script" "$@" 2>&1 | stdbuf -oL tee "$step_log"; then
+  bash "$script" "$@" 2>&1 | stdbuf -oL tee >(sed 's/\x1b\[[0-9;]*m//g' > "$step_log")
+  local rc=${PIPESTATUS[0]}
+  if [ $rc -eq 0 ]; then
     STEP_STATUS["$name"]="ok"
     success "$name  ($(( SECONDS - t ))s)"
   else

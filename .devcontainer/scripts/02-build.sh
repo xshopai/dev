@@ -56,9 +56,20 @@ build_service() {
   fi
 }
 
-# Fix NuGet directory permissions (named cache volume created as root)
-mkdir -p /home/codespace/.nuget/NuGet /home/codespace/.nuget/packages 2>/dev/null || true
-chmod -R 777 /home/codespace/.nuget 2>/dev/null || true
+# Fix ownership of all named-volume cache directories.
+# chmod can't fix root-owned dirs (non-root user lacks permission); only sudo
+# chown works. setup.sh also does this, but belt-and-suspenders for re-runs.
+sudo chown -R codespace:codespace \
+  /home/codespace/.nuget \
+  /home/codespace/.npm \
+  /home/codespace/.m2 \
+  2>/dev/null || true
+mkdir -p \
+  /home/codespace/.nuget/NuGet \
+  /home/codespace/.nuget/packages \
+  /home/codespace/.npm \
+  /home/codespace/.m2 \
+  2>/dev/null || true
 
 # =============================================================================
 # Wave 1 — Node.js + TypeScript (fast, CPU-light — all in parallel)
