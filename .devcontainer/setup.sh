@@ -36,11 +36,7 @@ mkdir -p \
   /home/codespace/.cache/pip
 
 LOG_FILE="$LOG_DIR/setup.log"
-# Write directly to LOG_FILE from each function rather than via exec >/tee.
-# Using exec > >(tee >(sed ...)) causes bash to hang after setup completes:
-# background services started by dev.sh inherit the pipe write-end, so tee
-# never sees EOF and bash waits forever. Direct >> in each function avoids
-# any pipe that background processes could accidentally keep alive.
+# Write directly to LOG_FILE from each log function (no exec > >(tee ...)).
 echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ===" > "$LOG_FILE"
 _SETUP_START=$SECONDS
 
@@ -85,14 +81,11 @@ run_step() {
   log "▶ $name"
   chmod +x "$script" 2>/dev/null || true
 
-  # Pipe step output to both the terminal AND a stripped log file.
-  # Nested process substitution >(sed ...) is safe here: run_step is only
-  # called for steps 1-5 which are fully synchronous (no background servers).
-  # When the script exits, tee sees EOF and the sed subshell drains cleanly.
-  # Step 6 bypasses run_step entirely (direct >> redirect) to avoid the known
-  # hang where background servers inherit the pipe write-end indefinitely.
+  # Write step output to both the terminal and a per-step log file.
+  # Simple pipe: script | tee logfile. ANSI codes remain in the log
+  # (VS Code renders them fine). PIPESTATUS[0] captures the script exit code.
   local step_log="$LOG_DIR/$(echo "$name" | tr ' /\\' '---' | tr '[:upper:]' '[:lower:]' | tr '.' '-').log"
-  bash "$script" "$@" 2>&1 | tee >(sed 's/\x1b\[[0-9;]*[mGKHFJsulABCDEF]//g; s/\x1b\[[\?][0-9]*[lh]//g' > "$step_log")
+  bash "$script" "$@" 2>&1 | tee "$step_log"
   local rc=${PIPESTATUS[0]}
   if [ $rc -eq 0 ]; then
     STEP_STATUS["$name"]="ok"
@@ -113,7 +106,6 @@ STEPS=(
   "3. Seed config / .env"
   "4. Check infrastructure"
   "5. Seed databases"
-  "6. Start services"
 )
 
 run_step "1. Clone repositories"   "$SCRIPTS_DIR/01-clone.sh"
@@ -121,25 +113,6 @@ run_step "2. Build services"        "$SCRIPTS_DIR/02-build.sh"
 run_step "3. Seed config / .env"    "$SCRIPTS_DIR/03-env.sh"
 run_step "4. Check infrastructure"  "$SCRIPTS_DIR/04-infra.sh"
 run_step "5. Seed databases"        "$SCRIPTS_DIR/05-seed.sh"
-
-# Step 6 MUST NOT go through run_step (which pipes via tee).
-# dev.sh starts 16 long-running background servers. Those servers are forked
-# while dev.sh's bash process still has the tee pipe write-end as fd 1.
-# Even though each service redirects to its own log, the pipe write-end is
-# inherited at fork time and tee never sees EOF → setup.sh hangs forever.
-# Fix: bypass the pipe entirely — redirect output directly to the log file.
-_start_name="6. Start services"
-_start_log="$LOG_DIR/6--start-services.log"
-_start_t=$SECONDS
-log "▶ $_start_name"
-if bash "$SCRIPTS_DIR/06-start.sh" >> "$_start_log" 2>&1; then
-  STEP_STATUS["$_start_name"]="ok"
-  success "$_start_name  ($(( SECONDS - _start_t ))s)"
-else
-  STEP_STATUS["$_start_name"]="failed"
-  err "$_start_name failed after $(( SECONDS - _start_t ))s — see $_start_log"
-fi
-STEP_TIMES["$_start_name"]=$(( SECONDS - _start_t ))
 
 # =============================================================================
 # Summary
@@ -173,8 +146,14 @@ echo -e "  Log file: $LOG_FILE"
 echo -e "${CYAN}  ═══════════════════════════════════════════════════${NC}"
 echo ""
 
-# NOTE: workspace reload is handled by postAttachCommand in devcontainer.json
-# ('code -r' is unreliable here — VS Code server may not be ready yet when
-# postCreateCommand runs).
+# Getting started instructions
+echo -e "${CYAN}  Getting started:${NC}"
+echo -e "  ${WHITE}Start all services:${NC}   cd /workspaces/dev && ./dev.sh"
+echo -e "  ${WHITE}Stop all services:${NC}    cd /workspaces/dev && ./dev.sh --stop"
+echo -e "  ${WHITE}View service logs:${NC}    tail -f /workspaces/dev/logs/<service>.log"
+echo -e "  ${WHITE}Infrastructure:${NC}       docker compose -f /workspaces/dev/docker-compose.yml ps"
+echo ""
+echo -e "  Or use VS Code tasks: ${CYAN}Ctrl+Shift+P${NC} → ${CYAN}Tasks: Run Task${NC} → ${CYAN}Start All Services${NC}"
+echo ""
 
 echo "=== setup.sh completed in ${TOTAL}s ===" | tee -a "$LOG_FILE"

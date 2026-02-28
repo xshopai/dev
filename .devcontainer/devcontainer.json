@@ -22,11 +22,11 @@
   // Runs once after the container is first created.
   "postCreateCommand": "bash /workspaces/dev/.devcontainer/setup.sh",
 
-  // Open the multi-root workspace every time VS Code attaches to this container.
-  // postAttachCommand runs after the VS Code server is fully connected, making
-  // 'code -r' reliable. postCreateCommand is too early — the server isn't ready
-  // to accept CLI commands when setup.sh first runs.
-  "postAttachCommand": "code -r /workspaces/dev/xshopai.code-workspace",
+  // Open the multi-root workspace on first attach only.
+  // postAttachCommand runs after VS Code is fully connected to the container.
+  // The guard file prevents re-running on reconnect (which would cause an
+  // infinite reload loop since code -r triggers a window reload).
+  "postAttachCommand": "[ -f /tmp/.xshopai-workspace-opened ] || (code -r /workspaces/dev/xshopai.code-workspace && touch /tmp/.xshopai-workspace-opened)",
 
   // Forward all service and infra UI ports so they are accessible
   // from the developer's browser via the Codespace URL.
@@ -35,8 +35,8 @@
     8025, 6379
   ],
   "portsAttributes": {
-    "3000": { "label": "Customer UI", "onAutoForward": "openBrowser", "visibility": "public" },
-    "3001": { "label": "Admin UI", "onAutoForward": "openBrowser", "visibility": "public" },
+    "3000": { "label": "Customer UI", "onAutoForward": "notify", "visibility": "public" },
+    "3001": { "label": "Admin UI", "onAutoForward": "notify", "visibility": "public" },
     "8001": { "label": "product-service", "onAutoForward": "silent", "visibility": "public" },
     "8002": { "label": "user-service", "onAutoForward": "silent", "visibility": "public" },
     "8003": { "label": "admin-service", "onAutoForward": "silent", "visibility": "public" },
