@@ -30,24 +30,35 @@ wait_for_port() {
 
 log "Checking infrastructure health..."
 
-# Container names are prefixed with "dev-" (set via container_name: in docker-compose.yml).
-# From an external container on the same network, DNS resolves by container_name, not
-# the Compose service name — so we must use the dev- prefix here.
+# Use Compose service names (not container_name "dev-*" prefix).  Both resolve
+# on the xshopai-dev network; bare names match remoteEnv in devcontainer.json.
 
-# Run all checks in parallel
-wait_for_port dev-user-mongodb     27017 "MongoDB (user)"               120 &
-wait_for_port dev-product-mongodb  27017 "MongoDB (product)"            120 &
-wait_for_port dev-review-mongodb   27017 "MongoDB (review)"             120 &
-wait_for_port dev-audit-postgres   5432  "PostgreSQL (audit)"           120 &
-wait_for_port dev-order-processor-postgres 5432 "PostgreSQL (order-processor)" 120 &
-wait_for_port dev-order-sqlserver  1433  "SQL Server (order)"           180 &
-wait_for_port dev-payment-sqlserver 1433 "SQL Server (payment)"        180 &
-wait_for_port dev-inventory-mysql  3306  "MySQL (inventory)"            120 &
-wait_for_port dev-rabbitmq         5672  "RabbitMQ"                     120 &
-wait_for_port dev-redis            6379  "Redis"                         90 &
-wait_for_port dev-zipkin           9411  "Zipkin"                        90 &
-wait_for_port dev-mailpit          1025  "Mailpit (SMTP)"                90 &
+# Run all checks in parallel, collect PIDs to check exit codes.
+declare -A CHECK_PIDS
+wait_for_port user-mongodb     27017 "MongoDB (user)"               120 & CHECK_PIDS[$!]="MongoDB (user)"
+wait_for_port product-mongodb  27017 "MongoDB (product)"            120 & CHECK_PIDS[$!]="MongoDB (product)"
+wait_for_port review-mongodb   27017 "MongoDB (review)"             120 & CHECK_PIDS[$!]="MongoDB (review)"
+wait_for_port audit-postgres   5432  "PostgreSQL (audit)"           120 & CHECK_PIDS[$!]="PostgreSQL (audit)"
+wait_for_port order-processor-postgres 5432 "PostgreSQL (order-processor)" 120 & CHECK_PIDS[$!]="PostgreSQL (order-processor)"
+wait_for_port order-sqlserver  1433  "SQL Server (order)"           180 & CHECK_PIDS[$!]="SQL Server (order)"
+wait_for_port payment-sqlserver 1433 "SQL Server (payment)"        180 & CHECK_PIDS[$!]="SQL Server (payment)"
+wait_for_port inventory-mysql  3306  "MySQL (inventory)"            120 & CHECK_PIDS[$!]="MySQL (inventory)"
+wait_for_port rabbitmq         5672  "RabbitMQ"                     120 & CHECK_PIDS[$!]="RabbitMQ"
+wait_for_port redis            6379  "Redis"                         90 & CHECK_PIDS[$!]="Redis"
+wait_for_port zipkin           9411  "Zipkin"                        90 & CHECK_PIDS[$!]="Zipkin"
+wait_for_port mailpit          1025  "Mailpit (SMTP)"                90 & CHECK_PIDS[$!]="Mailpit (SMTP)"
 
-wait
+# Wait for all and track failures
+INFRA_FAILURES=0
+for pid in "${!CHECK_PIDS[@]}"; do
+  if ! wait "$pid"; then
+    (( INFRA_FAILURES++ )) || true
+  fi
+done
 
 log "Infrastructure checks complete"
+
+if [ "$INFRA_FAILURES" -gt 0 ]; then
+  err "$INFRA_FAILURES service(s) not ready — some steps may fail"
+  exit 1
+fi

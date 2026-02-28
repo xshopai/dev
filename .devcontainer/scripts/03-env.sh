@@ -18,51 +18,68 @@ warn()    { echo -e "${YELLOW}[env $(_ts)]${NC} ⚠ $1"; }
 err()     { echo -e "${RED}[env $(_ts)]${NC} ✗ $1"; }
 
 # -----------------------------------------------------------------------------
-# Patch localhost DB/broker hostnames → Docker container_name values.
-# Infra containers use 'container_name: dev-<svc>' in docker-compose.yml.
-# container_name DNS works from ANY container on the same network;
-# Compose service-name aliases only work within the same Compose project.
-# Inter-service HTTP URLs (localhost:800x) are intentionally left as-is.
+# Patch localhost DB/broker hostnames → Docker Compose service names.
+# Both the Compose service name (e.g. user-mongodb) and the container_name
+# (e.g. dev-user-mongodb) resolve on the xshopai-dev network.  We use bare
+# Compose service names here to stay consistent with remoteEnv in
+# devcontainer.json.  Inter-service HTTP URLs (localhost:800x) are left as-is.
 #
 # IMPORTANT: sed patterns are idempotent — safe to run on an already-patched
-# file (dev-user-mongodb:27017 does not match localhost:27018, so it's a no-op).
+# file (user-mongodb:27017 does not match localhost:27018, so it's a no-op).
+# Also handles previously-patched dev-* hostnames → bare names.
 # -----------------------------------------------------------------------------
 patch_hostnames() {
   local f="$1"
   [ -f "$f" ] || return
   sed -i \
-    -e 's|localhost:27018|dev-user-mongodb:27017|g' \
-    -e 's|localhost:27019|dev-product-mongodb:27017|g' \
-    -e 's|localhost:27020|dev-review-mongodb:27017|g' \
-    -e 's|POSTGRES_HOST=localhost|POSTGRES_HOST=dev-audit-postgres|g' \
+    -e 's|localhost:27018|user-mongodb:27017|g' \
+    -e 's|localhost:27019|product-mongodb:27017|g' \
+    -e 's|localhost:27020|review-mongodb:27017|g' \
+    -e 's|dev-user-mongodb|user-mongodb|g' \
+    -e 's|dev-product-mongodb|product-mongodb|g' \
+    -e 's|dev-review-mongodb|review-mongodb|g' \
+    -e 's|POSTGRES_HOST=localhost|POSTGRES_HOST=audit-postgres|g' \
+    -e 's|POSTGRES_HOST=dev-audit-postgres|POSTGRES_HOST=audit-postgres|g' \
     -e 's|POSTGRES_PORT=5434|POSTGRES_PORT=5432|g' \
-    -e 's|RABBITMQ_URL=amqp://admin:admin123@localhost|RABBITMQ_URL=amqp://admin:admin123@dev-rabbitmq|g' \
-    -e 's|localhost:3306|dev-inventory-mysql:3306|g' \
-    -e 's|REDIS_HOST=localhost|REDIS_HOST=dev-redis|g' \
-    -e 's|SMTP_HOST=localhost|SMTP_HOST=dev-mailpit|g' \
+    -e 's|RABBITMQ_URL=amqp://admin:admin123@localhost|RABBITMQ_URL=amqp://admin:admin123@rabbitmq|g' \
+    -e 's|RABBITMQ_URL=amqp://admin:admin123@dev-rabbitmq|RABBITMQ_URL=amqp://admin:admin123@rabbitmq|g' \
+    -e 's|localhost:3306|inventory-mysql:3306|g' \
+    -e 's|dev-inventory-mysql|inventory-mysql|g' \
+    -e 's|REDIS_HOST=localhost|REDIS_HOST=redis|g' \
+    -e 's|REDIS_HOST=dev-redis|REDIS_HOST=redis|g' \
+    -e 's|SMTP_HOST=localhost|SMTP_HOST=mailpit|g' \
+    -e 's|SMTP_HOST=dev-mailpit|SMTP_HOST=mailpit|g' \
     -e 's|SMTP_PORT=1025.*|SMTP_PORT=1025|g' \
     "$f"
 }
 
 # Patch localhost hostnames in .NET appsettings JSON files.
+# Handles both fresh (localhost) and previously-patched (dev-*) patterns.
 patch_appsettings() {
   local f="$1"
   [ -f "$f" ] || return
   sed -i \
-    -e 's|"Host": "localhost"|"Host": "dev-rabbitmq"|g' \
-    -e 's|Server=localhost,1434;Database=order_service_db|Server=dev-order-sqlserver,1433;Database=order_service_db|g' \
-    -e 's|Server=localhost,1434;Database=payment_service_db|Server=dev-payment-sqlserver,1433;Database=payment_service_db|g' \
-    -e 's|http://localhost:9411|http://dev-zipkin:9411|g' \
+    -e 's|"Host": "localhost"|"Host": "rabbitmq"|g' \
+    -e 's|"Host": "dev-rabbitmq"|"Host": "rabbitmq"|g' \
+    -e 's|Server=localhost,1434;Database=order_service_db|Server=order-sqlserver,1433;Database=order_service_db|g' \
+    -e 's|Server=dev-order-sqlserver,1433;Database=order_service_db|Server=order-sqlserver,1433;Database=order_service_db|g' \
+    -e 's|Server=localhost,1434;Database=payment_service_db|Server=payment-sqlserver,1433;Database=payment_service_db|g' \
+    -e 's|Server=dev-payment-sqlserver,1433;Database=payment_service_db|Server=payment-sqlserver,1433;Database=payment_service_db|g' \
+    -e 's|http://localhost:9411|http://zipkin:9411|g' \
+    -e 's|http://dev-zipkin:9411|http://zipkin:9411|g' \
     "$f"
 }
 
 # Patch localhost hostnames in Java Spring Boot YAML config files.
+# Handles both fresh (localhost) and previously-patched (dev-*) patterns.
 patch_java_yml() {
   local f="$1"
   [ -f "$f" ] || return
   sed -i \
-    -e 's|  host: localhost|  host: dev-rabbitmq|g' \
-    -e 's|jdbc:postgresql://localhost:5435/order_processor_db|jdbc:postgresql://dev-order-processor-postgres:5432/order_processor_db|g' \
+    -e 's|  host: localhost|  host: rabbitmq|g' \
+    -e 's|  host: dev-rabbitmq|  host: rabbitmq|g' \
+    -e 's|jdbc:postgresql://localhost:5435/order_processor_db|jdbc:postgresql://order-processor-postgres:5432/order_processor_db|g' \
+    -e 's|jdbc:postgresql://dev-order-processor-postgres:5432/order_processor_db|jdbc:postgresql://order-processor-postgres:5432/order_processor_db|g' \
     "$f"
 }
 

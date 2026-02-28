@@ -22,8 +22,6 @@
 # Note: Auth service uses user-service database (no separate database)
 #       Cart service uses Redis (no separate database)
 
-version: "3.8"
-
 services:
   # ============================================================================
   # Message Broker
@@ -98,7 +96,7 @@ services:
     networks:
       - xshopai-dev
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "redis-cli", "-a", "redis_dev_pass_123", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3

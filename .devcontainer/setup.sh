@@ -42,7 +42,7 @@ _SETUP_START=$SECONDS
 
 # Colors
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'
-RED='\033[0;31m';   CYAN='\033[0;36m';   NC='\033[0m'
+RED='\033[0;31m';   CYAN='\033[0;36m';   WHITE='\033[1;37m'; NC='\033[0m'
 
 _ts()     { date -u '+%H:%M:%S'; }
 log()     { echo -e "${BLUE}[setup $(_ts)]${NC} $1";    echo "[setup $(_ts)] $1"   >> "$LOG_FILE"; }

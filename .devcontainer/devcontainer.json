@@ -52,6 +52,8 @@
     "8013": { "label": "chat-service", "onAutoForward": "silent", "visibility": "public" },
     "8014": { "label": "web-bff", "onAutoForward": "notify", "visibility": "public" },
     "15672": { "label": "RabbitMQ UI", "onAutoForward": "silent", "visibility": "public" },
+    "5672": { "label": "RabbitMQ AMQP", "onAutoForward": "silent", "visibility": "public" },
+    "6379": { "label": "Redis", "onAutoForward": "silent", "visibility": "public" },
     "9411": { "label": "Zipkin Tracing", "onAutoForward": "silent", "visibility": "public" },
     "8025": { "label": "Mailpit (Email)", "onAutoForward": "silent", "visibility": "public" }
   },
@@ -86,8 +88,10 @@
     "ORDER_PROCESSOR_POSTGRES_URL": "postgresql://postgres:postgres@order-processor-postgres:5432/order_processor_db",
 
     // ── SQL Server ────────────────────────────────────────────────────────────
-    "ORDER_SQLSERVER_URL": "Server=order-sqlserver,1433;Database=OrderServiceDB;User Id=sa;Password=Admin123!;TrustServerCertificate=True",
-    "PAYMENT_SQLSERVER_URL": "Server=payment-sqlserver,1433;Database=PaymentServiceDB;User Id=sa;Password=Admin123!;TrustServerCertificate=True",
+    // Note: .NET services read connection strings from appsettings (not env
+    // vars), so these are for reference / db-seeder / ad-hoc scripts only.
+    "ORDER_SQLSERVER_URL": "Server=order-sqlserver,1433;Database=order_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True",
+    "PAYMENT_SQLSERVER_URL": "Server=payment-sqlserver,1433;Database=payment_service_db;User Id=sa;Password=Admin123!;TrustServerCertificate=True",
 
     // ── MySQL ─────────────────────────────────────────────────────────────────
     "INVENTORY_MYSQL_URL": "mysql://admin:admin123@inventory-mysql:3306/inventory_service_db",

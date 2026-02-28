@@ -36,6 +36,7 @@ REPOS=(
 )
 
 PIDS=()
+declare -A PID_REPO  # Map PID → repo name for error reporting
 SKIPPED=0
 CLONING=0
 
@@ -47,6 +48,7 @@ for repo in "${REPOS[@]}"; do
   else
     log "Cloning $repo..."
     git clone --depth 1 "https://github.com/$ORG/$repo.git" "$target" &
+    PID_REPO[$!]="$repo"
     PIDS+=($!)
     (( CLONING++ )) || true
   fi
@@ -56,7 +58,7 @@ done
 FAILED=()
 for pid in "${PIDS[@]}"; do
   if ! wait "$pid"; then
-    FAILED+=("$pid")
+    FAILED+=("${PID_REPO[$pid]}")
   fi
 done
 
@@ -64,7 +66,7 @@ done
 find "$WORKSPACES_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 
 if [ ${#FAILED[@]} -gt 0 ]; then
-  err "${#FAILED[@]} clone(s) failed — check output above"
+  err "Failed to clone: ${FAILED[*]}"
   exit 1
 fi
 
