@@ -73,20 +73,20 @@ dev/
 
 Started by `docker-compose.yml` (shared between all setups):
 
-| Service              | Container                    | Ports          |
-| -------------------- | ---------------------------- | -------------- |
-| RabbitMQ             | dev-rabbitmq                 | 5672, 15672    |
-| Zipkin               | dev-zipkin                   | 9411           |
-| Mailpit              | dev-mailpit                  | 1025, 8025     |
-| Redis                | dev-redis                    | 6379           |
-| User MongoDB         | dev-user-mongodb             | 27018 → 27017  |
-| Product MongoDB      | dev-product-mongodb          | 27019 → 27017  |
-| Review MongoDB       | dev-review-mongodb           | 27020 → 27017  |
-| Audit PostgreSQL     | dev-audit-postgres           | 5434 → 5432    |
-| Order Processor PG   | dev-order-processor-postgres | 5435 → 5432    |
-| Order SQL Server     | dev-order-sqlserver          | 1434 → 1433    |
-| Payment SQL Server   | dev-payment-sqlserver        | 1433 → 1433    |
-| Inventory MySQL      | dev-inventory-mysql          | 3306 → 3306    |
+| Service            | Container                    | Ports         |
+| ------------------ | ---------------------------- | ------------- |
+| RabbitMQ           | dev-rabbitmq                 | 5672, 15672   |
+| Zipkin             | dev-zipkin                   | 9411          |
+| Mailpit            | dev-mailpit                  | 1025, 8025    |
+| Redis              | dev-redis                    | 6379          |
+| User MongoDB       | dev-user-mongodb             | 27018 → 27017 |
+| Product MongoDB    | dev-product-mongodb          | 27019 → 27017 |
+| Review MongoDB     | dev-review-mongodb           | 27020 → 27017 |
+| Audit PostgreSQL   | dev-audit-postgres           | 5434 → 5432   |
+| Order Processor PG | dev-order-processor-postgres | 5435 → 5432   |
+| Order SQL Server   | dev-order-sqlserver          | 1434 → 1433   |
+| Payment SQL Server | dev-payment-sqlserver        | 1433 → 1433   |
+| Inventory MySQL    | dev-inventory-mysql          | 3306 → 3306   |
 
 ## Application Services
 

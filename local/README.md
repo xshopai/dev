@@ -31,14 +31,14 @@ cd dev/local
 
 This runs 6 steps automatically (fail-soft — failures are reported but don't abort):
 
-| # | Step | Script |
-|---|------|--------|
-| 0 | Check prerequisites | `scripts/00-prerequisites.sh` |
-| 1 | Clone all 17 repos | `scripts/01-clone.sh` |
-| 2 | Start infrastructure (12 Docker containers) | `scripts/04-infra.sh` |
-| 3 | Seed `.env` / config files | `scripts/03-env.sh` |
-| 4 | Build all services (Node.js, Python, .NET, Java) | `scripts/02-build.sh` |
-| 5 | Seed databases with sample data | `scripts/05-seed.sh` |
+| #   | Step                                             | Script                        |
+| --- | ------------------------------------------------ | ----------------------------- |
+| 0   | Check prerequisites                              | `scripts/00-prerequisites.sh` |
+| 1   | Clone all 17 repos                               | `scripts/01-clone.sh`         |
+| 2   | Start infrastructure (12 Docker containers)      | `scripts/04-infra.sh`         |
+| 3   | Seed `.env` / config files                       | `scripts/03-env.sh`           |
+| 4   | Build all services (Node.js, Python, .NET, Java) | `scripts/02-build.sh`         |
+| 5   | Seed databases with sample data                  | `scripts/05-seed.sh`          |
 
 Then start the platform:
 
