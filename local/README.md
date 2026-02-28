@@ -11,14 +11,14 @@ All services communicate via HTTP (no Dapr).
 
 ## Prerequisites
 
-| Tool             | Version | Install                                                          |
-| ---------------- | ------- | ---------------------------------------------------------------- |
-| **Docker**       | 24+     | [docker.com](https://docs.docker.com/get-docker/)               |
-| **Node.js**      | 18+     | [nodejs.org](https://nodejs.org/)                                |
-| **Python**       | 3.12+   | [python.org](https://www.python.org/downloads/)                  |
-| **Java**         | 17+     | [adoptium.net](https://adoptium.net/)                            |
-| **.NET SDK**     | 8+      | [dotnet.microsoft.com](https://dotnet.microsoft.com/download)    |
-| **Git**          | 2.30+   | [git-scm.com](https://git-scm.com/)                             |
+| Tool         | Version | Install                                                       |
+| ------------ | ------- | ------------------------------------------------------------- |
+| **Docker**   | 24+     | [docker.com](https://docs.docker.com/get-docker/)             |
+| **Node.js**  | 18+     | [nodejs.org](https://nodejs.org/)                             |
+| **Python**   | 3.12+   | [python.org](https://www.python.org/downloads/)               |
+| **Java**     | 17+     | [adoptium.net](https://adoptium.net/)                         |
+| **.NET SDK** | 8+      | [dotnet.microsoft.com](https://dotnet.microsoft.com/download) |
+| **Git**      | 2.30+   | [git-scm.com](https://git-scm.com/)                           |
 
 ---
 
@@ -26,17 +26,19 @@ All services communicate via HTTP (no Dapr).
 
 ```bash
 cd dev/local
-./setup.sh --seed
+./setup.sh
 ```
 
-This will:
+This runs 6 steps automatically (fail-soft — failures are reported but don't abort):
 
-1. ✅ Check all prerequisites are installed
-2. ✅ Clone all 16 service repositories + db-seeder
-3. ✅ Start all infrastructure (12 Docker containers)
-4. ✅ Seed `.env` / config files for every service
-5. ✅ Build all services (Node.js, Python, .NET, Java)
-6. ✅ Seed databases with sample data
+| # | Step | Script |
+|---|------|--------|
+| 0 | Check prerequisites | `scripts/00-prerequisites.sh` |
+| 1 | Clone all 17 repos | `scripts/01-clone.sh` |
+| 2 | Start infrastructure (12 Docker containers) | `scripts/04-infra.sh` |
+| 3 | Seed `.env` / config files | `scripts/03-env.sh` |
+| 4 | Build all services (Node.js, Python, .NET, Java) | `scripts/02-build.sh` |
+| 5 | Seed databases with sample data | `scripts/05-seed.sh` |
 
 Then start the platform:
 
@@ -46,13 +48,17 @@ Then start the platform:
 
 ---
 
-## Setup Options
+## Running Individual Steps
+
+Each step can be run independently — useful for debugging or re-running a single phase:
 
 ```bash
-./setup.sh                 # Full setup (no DB seeding)
-./setup.sh --seed          # Full setup + seed databases
-./setup.sh --skip-build    # Skip the build step (useful for reruns)
-./setup.sh --infra-only    # Only start Docker infrastructure
+bash scripts/00-prerequisites.sh   # Check tools are installed
+bash scripts/01-clone.sh           # Clone repos (skips existing)
+bash scripts/04-infra.sh           # Start Docker + health-check ports
+bash scripts/03-env.sh             # Copy .env templates (idempotent)
+bash scripts/02-build.sh           # Build all services (wave-based)
+bash scripts/05-seed.sh            # Write db-seeder .env + seed DBs
 ```
 
 ---
@@ -93,14 +99,14 @@ tail -f ../logs/product-service.log
 
 | Service     | URL                   |
 | ----------- | --------------------- |
-| Customer UI | http://localhost:3000  |
-| Admin UI    | http://localhost:3001  |
+| Customer UI | http://localhost:3000 |
+| Admin UI    | http://localhost:3001 |
 
 ### Backend for Frontend
 
 | Service | URL                   |
 | ------- | --------------------- |
-| Web BFF | http://localhost:8014  |
+| Web BFF | http://localhost:8014 |
 
 ### Microservices
 
@@ -122,24 +128,24 @@ tail -f ../logs/product-service.log
 
 ### Infrastructure UIs
 
-| Service             | URL                    | Credentials        |
-| ------------------- | ---------------------- | ------------------ |
-| RabbitMQ Management | http://localhost:15672  | admin / admin123   |
-| Zipkin Tracing      | http://localhost:9411   | —                  |
-| Mailpit Email UI    | http://localhost:8025   | —                  |
+| Service             | URL                    | Credentials      |
+| ------------------- | ---------------------- | ---------------- |
+| RabbitMQ Management | http://localhost:15672 | admin / admin123 |
+| Zipkin Tracing      | http://localhost:9411  | —                |
+| Mailpit Email UI    | http://localhost:8025  | —                |
 
 ### Database Connections
 
 | Database           | Port  | Connection String                                                              |
 | ------------------ | ----- | ------------------------------------------------------------------------------ |
-| User MongoDB       | 27018 | `mongodb://admin:admin123@localhost:27018/user_service_db?authSource=admin`     |
-| Product MongoDB    | 27019 | `mongodb://admin:admin123@localhost:27019/product_service_db?authSource=admin`  |
-| Review MongoDB     | 27020 | `mongodb://admin:admin123@localhost:27020/review_service_db?authSource=admin`   |
-| Audit PostgreSQL   | 5434  | `postgresql://admin:admin123@localhost:5434/audit_service_db`                   |
-| Order Processor PG | 5435  | `postgresql://postgres:postgres@localhost:5435/order_processor_db`              |
+| User MongoDB       | 27018 | `mongodb://admin:admin123@localhost:27018/user_service_db?authSource=admin`    |
+| Product MongoDB    | 27019 | `mongodb://admin:admin123@localhost:27019/product_service_db?authSource=admin` |
+| Review MongoDB     | 27020 | `mongodb://admin:admin123@localhost:27020/review_service_db?authSource=admin`  |
+| Audit PostgreSQL   | 5434  | `postgresql://admin:admin123@localhost:5434/audit_service_db`                  |
+| Order Processor PG | 5435  | `postgresql://postgres:postgres@localhost:5435/order_processor_db`             |
 | Order SQL Server   | 1434  | `Server=localhost,1434;User=sa;Password=Admin123!`                             |
 | Payment SQL Server | 1433  | `Server=localhost,1433;User=sa;Password=Admin123!`                             |
-| Inventory MySQL    | 3306  | `mysql://admin:admin123@localhost:3306/inventory_service_db`                    |
+| Inventory MySQL    | 3306  | `mysql://admin:admin123@localhost:3306/inventory_service_db`                   |
 | Redis (Cart)       | 6379  | `redis://localhost:6379` (password: `redis_dev_pass_123`)                      |
 
 ---
@@ -205,7 +211,14 @@ dev/
 │   ├── setup.sh            ← One-command setup orchestrator
 │   ├── dev.sh              ← Start/stop all services
 │   ├── build.sh            ← Build services (all or individual)
-│   └── README.md           ← This file
+│   ├── README.md           ← This file
+│   └── scripts/            ← Individual setup steps
+│       ├── 00-prerequisites.sh  ← Check Docker, Node, Python, Java, .NET, Git
+│       ├── 01-clone.sh          ← Clone 17 repos (parallel, shallow)
+│       ├── 02-build.sh          ← Build all services (wave-based)
+│       ├── 03-env.sh            ← Seed .env / appsettings / YAML configs
+│       ├── 04-infra.sh          ← Docker Compose up + health-check ports
+│       └── 05-seed.sh           ← Write db-seeder .env + run seed.py
 ├── .devcontainer/          ← Codespace / devcontainer setup
 │   ├── devcontainer.json
 │   ├── setup.sh
