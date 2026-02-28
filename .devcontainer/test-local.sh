@@ -207,7 +207,7 @@ DOCKER_RUN=(
   # Uses container_name (dev-*) so these work from outside the Compose project
   -e CODESPACES=true
   -e NODE_ENV=development
-  -e SERVICE_INVOCATION_MODE=http
+  -e PLATFORM_MODE=direct
   -e RABBITMQ_HOST=dev-rabbitmq
   -e RABBITMQ_PORT=5672
   -e RABBITMQ_USER=admin

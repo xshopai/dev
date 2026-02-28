@@ -119,7 +119,7 @@
     "JWT_ALGORITHM": "HS256",
     "JWT_EXPIRATION": "24h",
     "JWT_ISSUER": "auth-service",
-    "SERVICE_INVOCATION_MODE": "http",
+    "PLATFORM_MODE": "direct",
     "ALLOWED_ORIGINS": "http://localhost:3000,http://localhost:3001",
     "BROWSER": "none"
   },

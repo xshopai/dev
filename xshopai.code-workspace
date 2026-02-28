@@ -1,23 +1,89 @@
 {
   "folders": [
-    { "name": "🛠  dev (infrastructure)", "path": "." },
-    { "name": "👤 user-service", "path": "../user-service" },
-    { "name": "🔐 auth-service", "path": "../auth-service" },
-    { "name": "📦 product-service", "path": "../product-service" },
-    { "name": "📝 order-service", "path": "../order-service" },
-    { "name": "⚙️  order-processor-service", "path": "../order-processor-service" },
-    { "name": "💳 payment-service", "path": "../payment-service" },
-    { "name": "🛒 cart-service", "path": "../cart-service" },
-    { "name": "📊 inventory-service", "path": "../inventory-service" },
-    { "name": "⭐ review-service", "path": "../review-service" },
-    { "name": "🔔 notification-service", "path": "../notification-service" },
-    { "name": "📋 audit-service", "path": "../audit-service" },
-    { "name": "💬 chat-service", "path": "../chat-service" },
-    { "name": "🛡️  admin-service", "path": "../admin-service" },
-    { "name": "🌐 web-bff", "path": "../web-bff" },
-    { "name": "🖥️  customer-ui", "path": "../customer-ui" },
-    { "name": "🖥️  admin-ui", "path": "../admin-ui" },
-    { "name": "🌱 db-seeder", "path": "../db-seeder" },
+    {
+      "name": "admin-service",
+      "path": "../admin-service",
+    },
+    {
+      "name": "admin-ui",
+      "path": "../admin-ui",
+    },
+    {
+      "name": "audit-service",
+      "path": "../audit-service",
+    },
+    {
+      "name": "auth-service",
+      "path": "../auth-service",
+    },
+    {
+      "name": "cart-service",
+      "path": "../cart-service",
+    },
+    {
+      "name": "chat-service",
+      "path": "../chat-service",
+    },
+    {
+      "name": "customer-ui",
+      "path": "../customer-ui",
+    },
+    {
+      "name": "db-seeder",
+      "path": "../db-seeder",
+    },
+    {
+      "name": "docs",
+      "path": "../docs",
+    },
+    {
+      "name": "deployment",
+      "path": "../deployment",
+    },
+    {
+      "name": "dev",
+      "path": ".",
+    },
+    {
+      "name": "infrastructure",
+      "path": "../infrastructure",
+    },
+    {
+      "name": "inventory-service",
+      "path": "../inventory-service",
+    },
+    {
+      "name": "notification-service",
+      "path": "../notification-service",
+    },
+    {
+      "name": "order-processor-service",
+      "path": "../order-processor-service",
+    },
+    {
+      "name": "order-service",
+      "path": "../order-service",
+    },
+    {
+      "name": "payment-service",
+      "path": "../payment-service",
+    },
+    {
+      "name": "product-service",
+      "path": "../product-service",
+    },
+    {
+      "name": "review-service",
+      "path": "../review-service",
+    },
+    {
+      "name": "user-service",
+      "path": "../user-service",
+    },
+    {
+      "name": "web-bff",
+      "path": "../web-bff",
+    },
   ],
 
   "settings": {
@@ -52,6 +118,7 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit",
     },
+    "postman.settings.dotenv-detection-notification-visibility": false,
   },
 
   "extensions": {

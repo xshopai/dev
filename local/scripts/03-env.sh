@@ -2,12 +2,12 @@
 # =============================================================================
 # 03-env.sh — Seed .env files and write runtime configs for all services
 # =============================================================================
-# For LOCAL development — uses localhost with host-mapped ports (no hostname
-# patching needed, unlike the Codespace version).
+# For LOCAL development — uses localhost with host-mapped ports.
 #
-# - Node/Python/TypeScript services: .env.http → .env (or .env.example)
-# - .NET services: appsettings.Http.json → appsettings.Development.json
-# - Java service: application-http.yml → application-dev.yml
+# Each service is processed individually in a flat list:
+# - Node/Python/TypeScript: .env.example → .env
+# - .NET services: appsettings.Direct.json → appsettings.Development.json
+# - Java services: application-direct.yml → application-dev.yml
 #
 # Idempotent: copies only when target does not already exist.
 # =============================================================================
@@ -24,28 +24,69 @@ success() { echo -e "${GREEN}[env $(_ts)]${NC} ✓ $1"; }
 warn()    { echo -e "${YELLOW}[env $(_ts)]${NC} ⚠ $1"; }
 err()     { echo -e "${RED}[env $(_ts)]${NC} ✗ $1"; }
 
-# seed_env <service-name>
-# For local dev, .env.http / .env.example already contain localhost values —
-# we just copy them without any hostname patching.
-seed_env() {
+# =============================================================================
+# Per-service config seeding — handles .env, appsettings, and application.yml
+# =============================================================================
+seed_service_config() {
   local svc="$1"
-  local target="$WORKSPACE_ROOT/$svc/.env"
-  local http="$WORKSPACE_ROOT/$svc/.env.http"
-  local example="$WORKSPACE_ROOT/$svc/.env.example"
+  local svc_dir="$WORKSPACE_ROOT/$svc"
 
-  if [ -f "$target" ]; then
-    success "$svc  (.env exists)"
+  if [ ! -d "$svc_dir" ]; then
+    warn "$svc — directory not found, skipping"
     return
   fi
 
-  if [ -f "$http" ]; then
-    cp "$http" "$target"
-    success "$svc  (.env.http → .env)"
-  elif [ -f "$example" ]; then
-    cp "$example" "$target"
+  # --- .env file (Node / TypeScript / Python / UI services) ---
+  local env_target="$svc_dir/.env"
+  local env_example="$svc_dir/.env.example"
+
+  if [ -f "$env_target" ]; then
+    success "$svc  (.env exists)"
+  elif [ -f "$env_example" ]; then
+    cp "$env_example" "$env_target"
     success "$svc  (.env.example → .env)"
-  else
-    warn "$svc — no .env template found"
+  fi
+
+  # --- .NET appsettings (order-service) ---
+  if [ "$svc" = "order-service" ]; then
+    local order_http="$svc_dir/OrderService.Api/appsettings.Direct.json"
+    local order_dev="$svc_dir/OrderService.Api/appsettings.Development.json"
+    if [ -f "$order_dev" ]; then
+      success "$svc  (appsettings.Development.json exists)"
+    elif [ -f "$order_http" ]; then
+      cp "$order_http" "$order_dev"
+      success "$svc  (appsettings.Direct.json → Development.json)"
+    else
+      warn "$svc  appsettings.Direct.json not found"
+    fi
+  fi
+
+  # --- .NET appsettings (payment-service) ---
+  if [ "$svc" = "payment-service" ]; then
+    local pay_http="$svc_dir/PaymentService/appsettings.Direct.json"
+    local pay_dev="$svc_dir/PaymentService/appsettings.Development.json"
+    if [ -f "$pay_dev" ]; then
+      success "$svc  (appsettings.Development.json exists)"
+    elif [ -f "$pay_http" ]; then
+      cp "$pay_http" "$pay_dev"
+      success "$svc  (appsettings.Direct.json → Development.json)"
+    else
+      warn "$svc  appsettings.Direct.json not found"
+    fi
+  fi
+
+  # --- Java application-dev.yml (order-processor-service) ---
+  if [ "$svc" = "order-processor-service" ]; then
+    local ops_http="$svc_dir/src/main/resources/application-direct.yml"
+    local ops_dev="$svc_dir/src/main/resources/application-dev.yml"
+    if [ -f "$ops_dev" ]; then
+      success "$svc  (application-dev.yml exists)"
+    elif [ -f "$ops_http" ]; then
+      cp "$ops_http" "$ops_dev"
+      success "$svc  (application-direct.yml → application-dev.yml)"
+    else
+      warn "$svc  application-direct.yml not found"
+    fi
   fi
 }
 
@@ -60,62 +101,30 @@ else
 fi
 
 # =============================================================================
-# 2. Node / TypeScript / Python services (.env)
+# 2. All services — processed one at a time
 # =============================================================================
-log "Seeding .env files..."
-ENV_SERVICES=(
-  "admin-service" "audit-service" "auth-service"
-  "cart-service" "chat-service"
-  "inventory-service" "notification-service"
-  "product-service" "review-service"
-  "user-service" "web-bff"
-  "admin-ui" "customer-ui"
+ALL_SERVICES=(
+  "admin-service"
+  "audit-service"
+  "auth-service"
+  "cart-service"
+  "chat-service"
+  "inventory-service"
+  "notification-service"
+  "product-service"
+  "review-service"
+  "user-service"
+  "web-bff"
+  "admin-ui"
+  "customer-ui"
+  "order-service"
+  "payment-service"
+  "order-processor-service"
 )
-for svc in "${ENV_SERVICES[@]}"; do
-  seed_env "$svc"
+
+log "Seeding config for all services..."
+for svc in "${ALL_SERVICES[@]}"; do
+  seed_service_config "$svc"
 done
-
-# =============================================================================
-# 3. order-service — appsettings.Development.json
-# =============================================================================
-log "Writing .NET / Java configs..."
-ORDER_HTTP="$WORKSPACE_ROOT/order-service/OrderService.Api/appsettings.Http.json"
-ORDER_DEV="$WORKSPACE_ROOT/order-service/OrderService.Api/appsettings.Development.json"
-if [ -f "$ORDER_HTTP" ] && [ ! -f "$ORDER_DEV" ]; then
-  cp "$ORDER_HTTP" "$ORDER_DEV"
-  success "order-service  (appsettings.Http.json → Development.json)"
-elif [ -f "$ORDER_DEV" ]; then
-  success "order-service  (appsettings.Development.json exists)"
-else
-  warn "order-service  appsettings.Http.json not found"
-fi
-
-# =============================================================================
-# 4. payment-service — appsettings.Development.json
-# =============================================================================
-PAYMENT_HTTP="$WORKSPACE_ROOT/payment-service/PaymentService/appsettings.Http.json"
-PAYMENT_DEV="$WORKSPACE_ROOT/payment-service/PaymentService/appsettings.Development.json"
-if [ -f "$PAYMENT_HTTP" ] && [ ! -f "$PAYMENT_DEV" ]; then
-  cp "$PAYMENT_HTTP" "$PAYMENT_DEV"
-  success "payment-service  (appsettings.Http.json → Development.json)"
-elif [ -f "$PAYMENT_DEV" ]; then
-  success "payment-service  (appsettings.Development.json exists)"
-else
-  warn "payment-service  appsettings.Http.json not found"
-fi
-
-# =============================================================================
-# 5. order-processor-service — application-dev.yml
-# =============================================================================
-OPS_HTTP="$WORKSPACE_ROOT/order-processor-service/src/main/resources/application-http.yml"
-OPS_DEV="$WORKSPACE_ROOT/order-processor-service/src/main/resources/application-dev.yml"
-if [ -f "$OPS_HTTP" ] && [ ! -f "$OPS_DEV" ]; then
-  cp "$OPS_HTTP" "$OPS_DEV"
-  success "order-processor-service  (application-http.yml → application-dev.yml)"
-elif [ -f "$OPS_DEV" ]; then
-  success "order-processor-service  (application-dev.yml exists)"
-else
-  warn "order-processor-service  application-http.yml not found"
-fi
 
 success "Environment configuration complete"

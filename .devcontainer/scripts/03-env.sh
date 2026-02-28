@@ -2,7 +2,7 @@
 # =============================================================================
 # 03-env.sh — Seed .env files and write runtime configs for all services
 # =============================================================================
-# - Node/Python/TypeScript services: .env.http → .env (or .env.example)
+# - Node/Python/TypeScript services: .env.example → .env
 # - .NET services: writes appsettings.Development.json
 # - Java service: writes application-dev.yml
 # Idempotent: copies only if .env is missing, but ALWAYS patches hostnames.
@@ -86,13 +86,13 @@ patch_java_yml() {
 seed_env() {
   local svc="$1"
   local target="$WORKSPACES_DIR/$svc/.env"
-  local http="$WORKSPACES_DIR/$svc/.env.http"
+  local example="$WORKSPACES_DIR/$svc/.env.example"
 
-  # ALWAYS patch .env.http first — service startup scripts (scripts/dev.sh)
-  # unconditionally copy .env.http → .env on every launch, which would
+  # ALWAYS patch .env.example first — service startup scripts (scripts/dev.sh)
+  # unconditionally copy .env.example → .env on every launch, which would
   # overwrite any patches we apply to .env.  Patching the source file
   # ensures the copy already contains the correct container hostnames.
-  [ -f "$http" ] && patch_hostnames "$http"
+  [ -f "$example" ] && patch_hostnames "$example"
 
   if [ -f "$target" ]; then
     # File already exists (committed in repo with localhost hostnames).
@@ -102,12 +102,8 @@ seed_env() {
     return
   fi
 
-  if [ -f "$http" ]; then
-    cp "$http" "$target"
-    success "$svc  (.env.http → .env)"
-  elif [ -f "$WORKSPACES_DIR/$svc/.env.example" ]; then
-    cp "$WORKSPACES_DIR/$svc/.env.example" "$target"
-    patch_hostnames "$target"
+  if [ -f "$example" ]; then
+    cp "$example" "$target"
     success "$svc  (.env.example → .env)"
   else
     warn "$svc — no .env template found"
@@ -144,40 +140,40 @@ done
 # 3. order-service — appsettings.Development.json
 # =============================================================================
 log "Writing .NET / Java configs..."
-ORDER_HTTP="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Http.json"
+ORDER_HTTP="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Direct.json"
 ORDER_DEV="$WORKSPACES_DIR/order-service/OrderService.Api/appsettings.Development.json"
 if [ -f "$ORDER_HTTP" ]; then
   patch_appsettings "$ORDER_HTTP"
   cp "$ORDER_HTTP" "$ORDER_DEV"
-  success "order-service  (appsettings.Http.json patched → Development.json)"
+  success "order-service  (appsettings.Direct.json patched → Development.json)"
 else
-  warn "order-service  appsettings.Http.json not found"
+  warn "order-service  appsettings.Direct.json not found"
 fi
 
 # =============================================================================
 # 4. payment-service — appsettings.Development.json
 # =============================================================================
-PAYMENT_HTTP="$WORKSPACES_DIR/payment-service/PaymentService/appsettings.Http.json"
+PAYMENT_HTTP="$WORKSPACES_DIR/payment-service/PaymentService/appsettings.Direct.json"
 PAYMENT_DEV="$WORKSPACES_DIR/payment-service/PaymentService/appsettings.Development.json"
 if [ -f "$PAYMENT_HTTP" ]; then
   patch_appsettings "$PAYMENT_HTTP"
   cp "$PAYMENT_HTTP" "$PAYMENT_DEV"
-  success "payment-service  (appsettings.Http.json patched → Development.json)"
+  success "payment-service  (appsettings.Direct.json patched → Development.json)"
 else
-  warn "payment-service  appsettings.Http.json not found"
+  warn "payment-service  appsettings.Direct.json not found"
 fi
 
 # =============================================================================
 # 5. order-processor-service — application-dev.yml
 # =============================================================================
-OPS_HTTP="$WORKSPACES_DIR/order-processor-service/src/main/resources/application-http.yml"
+OPS_HTTP="$WORKSPACES_DIR/order-processor-service/src/main/resources/application-direct.yml"
 OPS_DEV="$WORKSPACES_DIR/order-processor-service/src/main/resources/application-dev.yml"
 if [ -f "$OPS_HTTP" ]; then
   patch_java_yml "$OPS_HTTP"
   cp "$OPS_HTTP" "$OPS_DEV"
-  success "order-processor-service  (application-http.yml patched → application-dev.yml)"
+  success "order-processor-service  (application-direct.yml patched → application-dev.yml)"
 else
-  warn "order-processor-service  application-http.yml not found"
+  warn "order-processor-service  application-direct.yml not found"
 fi
 
 # =============================================================================
@@ -214,7 +210,7 @@ if [ -n "$CODESPACE_NAME" ]; then
   success "React UI .env patched for Codespace"
 
   # --- web-bff ALLOWED_ORIGINS — add Codespace UI URLs ---
-  for envfile in "$WORKSPACES_DIR/web-bff/.env.http" "$WORKSPACES_DIR/web-bff/.env"; do
+  for envfile in "$WORKSPACES_DIR/web-bff/.env.example" "$WORKSPACES_DIR/web-bff/.env"; do
     if [ -f "$envfile" ]; then
       # Append Codespace origins to existing ALLOWED_ORIGINS value
       sed -i "s|^ALLOWED_ORIGINS=\(.*\)|ALLOWED_ORIGINS=\1,${CUSTOMER_URL},${ADMIN_URL}|g" "$envfile"
