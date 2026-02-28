@@ -179,3 +179,48 @@ if [ -f "$OPS_HTTP" ]; then
 else
   warn "order-processor-service  application-http.yml not found"
 fi
+
+# =============================================================================
+# 6. Codespace-specific patches for React UIs and CORS
+# =============================================================================
+# In Codespaces, the browser runs on the user's machine — not inside the
+# devcontainer.  React apps (customer-ui, admin-ui) fetch from the BFF via
+# REACT_APP_BFF_URL, which must be the Codespace forwarded URL, not localhost.
+# Similarly, the BFF's CORS allowlist must include the Codespace UI origins.
+if [ -n "$CODESPACE_NAME" ]; then
+  DOMAIN="${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-app.github.dev}"
+  BFF_URL="https://${CODESPACE_NAME}-8014.${DOMAIN}"
+  CUSTOMER_URL="https://${CODESPACE_NAME}-3000.${DOMAIN}"
+  ADMIN_URL="https://${CODESPACE_NAME}-3001.${DOMAIN}"
+
+  log "Codespace detected — patching UI and BFF configs"
+  log "  BFF URL:      $BFF_URL"
+  log "  Customer UI:  $CUSTOMER_URL"
+  log "  Admin UI:     $ADMIN_URL"
+
+  # --- React UI .env.example files (source of truth — scripts/dev.sh copies
+  #     .env.example → .env on every start, so we must patch the source) ---
+  for ui in admin-ui customer-ui; do
+    for envfile in "$WORKSPACES_DIR/$ui/.env.example" "$WORKSPACES_DIR/$ui/.env"; do
+      if [ -f "$envfile" ]; then
+        sed -i "s|REACT_APP_BFF_URL=.*|REACT_APP_BFF_URL=${BFF_URL}|g" "$envfile"
+        # webpack-dev-server WebSocket must use port 443 (Codespace HTTPS proxy)
+        grep -q "WDS_SOCKET_PORT" "$envfile" || echo "WDS_SOCKET_PORT=443" >> "$envfile"
+        # Don't try to open a browser from the Codespace terminal
+        grep -q "^BROWSER=" "$envfile" || echo "BROWSER=none" >> "$envfile"
+      fi
+    done
+  done
+  success "React UI .env patched for Codespace"
+
+  # --- web-bff ALLOWED_ORIGINS — add Codespace UI URLs ---
+  for envfile in "$WORKSPACES_DIR/web-bff/.env.http" "$WORKSPACES_DIR/web-bff/.env"; do
+    if [ -f "$envfile" ]; then
+      # Append Codespace origins to existing ALLOWED_ORIGINS value
+      sed -i "s|^ALLOWED_ORIGINS=\(.*\)|ALLOWED_ORIGINS=\1,${CUSTOMER_URL},${ADMIN_URL}|g" "$envfile"
+    fi
+  done
+  success "web-bff CORS origins patched for Codespace"
+else
+  log "Not running in Codespace — skipping UI URL patches"
+fi

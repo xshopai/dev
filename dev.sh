@@ -88,6 +88,18 @@ declare -a UIS=(
 echo -e "${CYAN}Starting services in background (logs in $LOG_DIR)${NC}"
 echo ""
 
+# Kill any existing process on a given port (prevents "port in use" errors)
+kill_port() {
+    local port="$1"
+    local pids
+    pids=$(lsof -ti:"$port" 2>/dev/null) || true
+    if [ -n "$pids" ]; then
+        echo -e "  ${YELLOW}Killing existing process on port $port${NC}"
+        echo "$pids" | xargs kill 2>/dev/null || true
+        sleep 0.5
+    fi
+}
+
 # Clear previous PID file
 > "$PID_FILE"
 
@@ -102,6 +114,7 @@ for service_info in "${SERVICES[@]}"; do
     LOG_FILE="$LOG_DIR/$path.log"
     
     if [ -f "$RUN_SCRIPT" ]; then
+        kill_port "$port"
         echo -e "  ${GREEN}✓ Starting $name (port $port)${NC}"
         
         # Run in background, redirect output to log file
@@ -126,6 +139,7 @@ for ui_info in "${UIS[@]}"; do
     LOG_FILE="$LOG_DIR/$path.log"
     
     if [ -f "$RUN_SCRIPT" ]; then
+        kill_port "$port"
         echo -e "  ${GREEN}✓ Starting $name (port $port)${NC}"
         
         # Run in background, redirect output to log file
