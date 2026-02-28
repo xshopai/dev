@@ -36,10 +36,12 @@ mkdir -p \
   /home/codespace/.cache/pip
 
 LOG_FILE="$LOG_DIR/setup.log"
-# tee keeps colours in the terminal; the process substitution strips ANSI before
-# appending to the log file so it's readable as plain text in VS Code / cat.
-exec > >(stdbuf -oL tee >(sed 's/\x1b\[[0-9;]*[mGKHF]//g' >> "$LOG_FILE")) 2>&1
-echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ==="
+# Write directly to LOG_FILE from each function rather than via exec >/tee.
+# Using exec > >(tee >(sed ...)) causes bash to hang after setup completes:
+# background services started by dev.sh inherit the pipe write-end, so tee
+# never sees EOF and bash waits forever. Direct >> in each function avoids
+# any pipe that background processes could accidentally keep alive.
+echo "=== setup.sh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ===" > "$LOG_FILE"
 _SETUP_START=$SECONDS
 
 # Colors
@@ -47,10 +49,10 @@ GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'
 RED='\033[0;31m';   CYAN='\033[0;36m';   NC='\033[0m'
 
 _ts()     { date -u '+%H:%M:%S'; }
-log()     { echo -e "${BLUE}[setup $(_ts)]${NC} $1"; }
-success() { echo -e "${GREEN}[setup $(_ts)]${NC} ✓ $1"; }
-warn()    { echo -e "${YELLOW}[setup $(_ts)]${NC} ⚠ $1"; }
-err()     { echo -e "${RED}[setup $(_ts)]${NC} ✗ $1"; }
+log()     { echo -e "${BLUE}[setup $(_ts)]${NC} $1";    echo "[setup $(_ts)] $1"   >> "$LOG_FILE"; }
+success() { echo -e "${GREEN}[setup $(_ts)]${NC} ✓ $1"; echo "[setup $(_ts)] ✓ $1" >> "$LOG_FILE"; }
+warn()    { echo -e "${YELLOW}[setup $(_ts)]${NC} ⚠ $1"; echo "[setup $(_ts)] ⚠ $1" >> "$LOG_FILE"; }
+err()     { echo -e "${RED}[setup $(_ts)]${NC} ✗ $1";  echo "[setup $(_ts)] ✗ $1"  >> "$LOG_FILE"; }
 
 # Fix execute permissions (Windows checkouts strip +x)
 find "$WORKSPACES_DIR/dev" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
@@ -83,13 +85,13 @@ run_step() {
   log "▶ $name"
   chmod +x "$script" 2>/dev/null || true
 
-  # Pipe step output to its own log file as well as the main setup log.
-  # - tee writes to terminal with colours intact
-  # - process substitution strips ANSI escape codes before writing to the file
-  #   so the log file is readable as plain text in VS Code / cat
-  # - PIPESTATUS[0] captures the exit code of the bash script, not tee
+  # Pipe step output to its own log file AND the terminal.
+  # Plain tee only — no nested >(sed ...) process substitution.
+  # Nested process substitution causes setup.sh to hang: background services
+  # started by dev.sh inherit the pipe's write-end, so tee never sees EOF.
+  # ANSI codes in step log files are acceptable (VS Code renders them).
   local step_log="$LOG_DIR/$(echo "$name" | tr ' /\\' '---' | tr '[:upper:]' '[:lower:]' | tr '.' '-').log"
-  bash "$script" "$@" 2>&1 | stdbuf -oL tee >(sed 's/\x1b\[[0-9;]*m//g' > "$step_log")
+  bash "$script" "$@" 2>&1 | tee "$step_log"
   local rc=${PIPESTATUS[0]}
   if [ $rc -eq 0 ]; then
     STEP_STATUS["$name"]="ok"
@@ -156,4 +158,4 @@ echo ""
 # did not trigger — harmless if it already opened)
 code -r /workspaces/dev/xshopai.code-workspace 2>/dev/null || true
 
-echo "=== setup.sh completed in ${TOTAL}s ==="
+echo "=== setup.sh completed in ${TOTAL}s ===" | tee -a "$LOG_FILE"
