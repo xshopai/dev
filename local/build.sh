@@ -640,6 +640,20 @@ build_service() {
                 [[ -n "$temp_dir" ]] && echo "$service_name|FAILED|${duration}s|$build_error" >> "$temp_dir/build_results.txt"
                 return 1
             fi
+
+            # Detect Java version required from pom.xml and set JAVA_HOME accordingly
+            local required_java_version
+            required_java_version=$(grep -oP '<java.version>\K[0-9]+' pom.xml 2>/dev/null || echo "")
+            if [[ -n "$required_java_version" ]]; then
+                local java_base="/c/Program Files/Java"
+                # Find a matching JDK directory (e.g., jdk-17.0.18 for version 17)
+                local matching_jdk
+                matching_jdk=$(find "$java_base" -maxdepth 1 -type d -name "jdk-${required_java_version}*" | sort -V | tail -1)
+                if [[ -n "$matching_jdk" && -f "$matching_jdk/bin/java.exe" ]]; then
+                    export JAVA_HOME="$matching_jdk"
+                    log_debug "Set JAVA_HOME=$JAVA_HOME (required: Java $required_java_version)"
+                fi
+            fi
             
             local maven_cmd="mvn"
             if [[ -f "/c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.11/bin/mvn" ]]; then
