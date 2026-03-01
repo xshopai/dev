@@ -39,7 +39,19 @@ mkdir -p "$LOG_DIR"
 # Function to stop all services
 stop_services() {
     echo -e "${YELLOW}Stopping all services...${NC}"
-    
+
+    # Deregister all services from Consul first (before killing processes,
+    # since kill may not propagate SIGTERM to child processes running the
+    # deregister-on-shutdown handlers)
+    if curl -s --max-time 2 http://localhost:8500/v1/status/leader &>/dev/null; then
+        echo -e "  ${CYAN}Deregistering services from Consul...${NC}"
+        SERVICE_IDS=$(curl -s http://localhost:8500/v1/agent/services | python3 -c "import sys,json; [print(k) for k in json.load(sys.stdin).keys()]" 2>/dev/null)
+        for sid in $SERVICE_IDS; do
+            curl -s -X PUT "http://localhost:8500/v1/agent/service/deregister/$sid" &>/dev/null
+            echo -e "    Deregistered: $sid"
+        done
+    fi
+
     if [ -f "$PID_FILE" ]; then
         while read -r line; do
             name=$(echo "$line" | cut -d':' -f1)
