@@ -77,6 +77,7 @@ wait_for_port localhost 5672  "RabbitMQ"                     120 & CHECK_PIDS[$!
 wait_for_port localhost 6379  "Redis"                         90 & CHECK_PIDS[$!]="Redis"
 wait_for_port localhost 9411  "Zipkin"                        90 & CHECK_PIDS[$!]="Zipkin"
 wait_for_port localhost 1025  "Mailpit (SMTP)"                90 & CHECK_PIDS[$!]="Mailpit (SMTP)"
+wait_for_port localhost 8500  "Consul"                        90 & CHECK_PIDS[$!]="Consul"
 
 # Wait for all and track failures
 INFRA_FAILURES=0

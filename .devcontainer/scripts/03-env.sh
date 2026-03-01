@@ -50,6 +50,8 @@ patch_hostnames() {
     -e 's|SMTP_HOST=localhost|SMTP_HOST=mailpit|g' \
     -e 's|SMTP_HOST=dev-mailpit|SMTP_HOST=mailpit|g' \
     -e 's|SMTP_PORT=1025.*|SMTP_PORT=1025|g' \
+    -e 's|CONSUL_URL=http://localhost:8500|CONSUL_URL=http://consul:8500|g' \
+    -e 's|CONSUL_URL=http://dev-consul:8500|CONSUL_URL=http://consul:8500|g' \
     "$f"
 }
 

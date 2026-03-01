@@ -47,6 +47,7 @@ wait_for_port rabbitmq         5672  "RabbitMQ"                     120 & CHECK_
 wait_for_port redis            6379  "Redis"                         90 & CHECK_PIDS[$!]="Redis"
 wait_for_port zipkin           9411  "Zipkin"                        90 & CHECK_PIDS[$!]="Zipkin"
 wait_for_port mailpit          1025  "Mailpit (SMTP)"                90 & CHECK_PIDS[$!]="Mailpit (SMTP)"
+wait_for_port consul           8500  "Consul"                        90 & CHECK_PIDS[$!]="Consul"
 
 # Wait for all and track failures
 INFRA_FAILURES=0
