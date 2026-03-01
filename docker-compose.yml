@@ -10,6 +10,7 @@
 #   docker-compose down --volumes  # Remove all data
 #
 # Services included:
+#   - Service Discovery (Consul)
 #   - Message Broker (RabbitMQ)
 #   - Distributed Tracing (Zipkin)
 #   - Email Testing (Mailpit)
@@ -23,6 +24,27 @@
 #       Cart service uses Redis (no separate database)
 
 services:
+  # ============================================================================
+  # Service Discovery
+  # ============================================================================
+  consul:
+    image: hashicorp/consul:1.17
+    container_name: dev-consul
+    restart: unless-stopped
+    ports:
+      - "8500:8500" # HTTP API + Web UI
+      - "8600:8600/udp" # DNS
+    command: agent -server -bootstrap-expect=1 -ui -client=0.0.0.0 -bind=127.0.0.1
+    volumes:
+      - consul_data:/consul/data
+    networks:
+      - xshopai-dev
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   # ============================================================================
   # Message Broker
   # ============================================================================
@@ -237,6 +259,8 @@ services:
 # Volumes
 # ============================================================================
 volumes:
+  consul_data:
+    name: xshopai-dev-consul
   rabbitmq_data:
     name: xshopai-dev-rabbitmq
   redis_data:
