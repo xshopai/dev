@@ -37,10 +37,6 @@
       "path": "../docs",
     },
     {
-      "name": "deployment",
-      "path": "../deployment",
-    },
-    {
       "name": "dev",
       "path": ".",
     },
@@ -125,9 +121,7 @@
     "recommendations": [
       "dbaeumer.vscode-eslint",
       "esbenp.prettier-vscode",
-      "christian-kohler.npm-intellisense",
       "ms-python.python",
-      "ms-python.pylint",
       "ms-python.black-formatter",
       "vscjava.vscode-java-pack",
       "ms-dotnettools.csdevkit",
@@ -135,69 +129,9 @@
       "mongodb.mongodb-vscode",
       "mtxr.sqltools",
       "mtxr.sqltools-driver-pg",
-      "mtxr.sqltools-driver-mssql",
-      "mtxr.sqltools-driver-mysql",
       "humao.rest-client",
       "mikestead.dotenv",
-      "github.vscode-pull-request-github",
       "github.copilot",
-    ],
-  },
-
-  "launch": {
-    "version": "0.2.0",
-    "compounds": [
-      {
-        "name": "Start All Services",
-        "configurations": [],
-        "preLaunchTask": "Start All Services",
-      },
-    ],
-  },
-
-  "tasks": {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "label": "Start All Services",
-        "type": "shell",
-        "command": "cd /workspaces/dev/.devcontainer && ./dev.sh",
-        "presentation": {
-          "reveal": "always",
-          "focus": true,
-          "panel": "dedicated",
-          "clear": true,
-        },
-        "runOptions": {},
-      },
-      {
-        "label": "Stop All Services",
-        "type": "shell",
-        "command": "cd /workspaces/dev/.devcontainer && ./dev.sh --stop",
-        "presentation": {
-          "reveal": "always",
-          "focus": true,
-          "panel": "shared",
-        },
-      },
-      {
-        "label": "Infrastructure Up",
-        "type": "shell",
-        "command": "cd /workspaces/dev && docker compose up -d",
-        "presentation": {
-          "reveal": "always",
-          "panel": "shared",
-        },
-      },
-      {
-        "label": "Infrastructure Down",
-        "type": "shell",
-        "command": "cd /workspaces/dev && docker compose down",
-        "presentation": {
-          "reveal": "always",
-          "panel": "shared",
-        },
-      },
     ],
   },
 }
