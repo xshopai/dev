@@ -120,7 +120,10 @@
     "JWT_EXPIRATION": "24h",
     "JWT_ISSUER": "auth-service",
     "PLATFORM_MODE": "direct",
-    "ALLOWED_ORIGINS": "http://localhost:3000,http://localhost:3001",
+    // ALLOWED_ORIGINS is NOT set here — 03-env.sh patches web-bff/.env with
+    // the correct value (localhost in local mode, Codespace URLs when running
+    // in a Codespace). Setting it here as a remoteEnv would take precedence
+    // over the .env file and prevent the Codespace-specific patch from working.
     "BROWSER": "none"
   },
 

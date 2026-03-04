@@ -25,7 +25,6 @@ REPOS=(
   "customer-ui"
   "db-seeder"
   "docs"
-  "deployment"
   "infrastructure"
   "inventory-service"
   "notification-service"

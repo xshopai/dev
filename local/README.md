@@ -1,11 +1,7 @@
 # xshopai — Local Development Setup
 
 Run the entire xshopai platform on your local machine with a single command.
-All services communicate via HTTP (no Dapr).
-
-> **Looking for Codespace setup?** See [../.devcontainer/](../.devcontainer/) — one-click cloud-based dev environment.
->
-> **Need Dapr-based local dev?** A `local-dapr/` folder will be added in the future.
+Services run in `PLATFORM_MODE=direct` — direct HTTP communication between services, without a Dapr sidecar.
 
 ---
 

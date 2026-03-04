@@ -8,6 +8,7 @@
 
 WORKSPACES_DIR="/workspaces"
 DEV_DIR="$WORKSPACES_DIR/dev"
+DEVCONTAINER_DIR="$DEV_DIR/.devcontainer"
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; RED='\033[0;31m'; NC='\033[0m'
 _ts() { date -u '+%H:%M:%S'; }
@@ -16,13 +17,13 @@ success() { echo -e "${GREEN}[start $(_ts)]${NC} ✓ $1"; }
 warn()    { echo -e "${YELLOW}[start $(_ts)]${NC} ⚠ $1"; }
 err()     { echo -e "${RED}[start $(_ts)]${NC} ✗ $1"; }
 
-if [ ! -f "$DEV_DIR/dev.sh" ]; then
-  err "dev.sh not found at $DEV_DIR/dev.sh"
+if [ ! -f "$DEVCONTAINER_DIR/dev.sh" ]; then
+  err "dev.sh not found at $DEVCONTAINER_DIR/dev.sh"
   exit 1
 fi
 
 log "Starting all services via dev.sh..."
-cd "$DEV_DIR"
+cd "$DEVCONTAINER_DIR"
 
 if bash ./dev.sh; then
   success "All services started"
