@@ -80,6 +80,9 @@
       "name": "web-bff",
       "path": "../web-bff",
     },
+    {
+      "path": "../.github",
+    },
   ],
 
   "settings": {
