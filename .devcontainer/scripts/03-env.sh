@@ -204,6 +204,13 @@ if [ -n "$CODESPACE_NAME" ]; then
         sed -i "s|REACT_APP_BFF_URL=.*|REACT_APP_BFF_URL=${BFF_URL}|g" "$envfile"
         # webpack-dev-server WebSocket must use port 443 (Codespace HTTPS proxy)
         grep -q "WDS_SOCKET_PORT" "$envfile" || echo "WDS_SOCKET_PORT=443" >> "$envfile"
+        # Bind to all interfaces so Codespace port forwarding can reach the dev server.
+        # Without this, CRA binds to 127.0.0.1 only and the forwarded port gets no response.
+        grep -q "^HOST=" "$envfile" || echo "HOST=0.0.0.0" >> "$envfile"
+        # Skip webpack-dev-server host check — the Codespace forwarded hostname
+        # (e.g. name-3000.app.github.dev) is not localhost, so without this the
+        # server returns "Invalid Host header" for every request.
+        grep -q "^DANGEROUSLY_DISABLE_HOST_CHECK=" "$envfile" || echo "DANGEROUSLY_DISABLE_HOST_CHECK=true" >> "$envfile"
         # Don't try to open a browser from the Codespace terminal
         grep -q "^BROWSER=" "$envfile" || echo "BROWSER=none" >> "$envfile"
       fi
