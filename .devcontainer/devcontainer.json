@@ -129,46 +129,10 @@
 
   "customizations": {
     "vscode": {
-      "extensions": [
-        // JavaScript / TypeScript / Node.js
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "christian-kohler.npm-intellisense",
-        // Python
-        "ms-python.python",
-        "ms-python.pylint",
-        "ms-python.black-formatter",
-        // Java
-        "vscjava.vscode-java-pack",
-        // .NET / C#
-        "ms-dotnettools.csdevkit",
-        // Docker
-        "ms-azuretools.vscode-docker",
-        // Databases
-        "mongodb.mongodb-vscode",
-        "mtxr.sqltools",
-        "mtxr.sqltools-driver-pg",
-        "mtxr.sqltools-driver-mssql",
-        "mtxr.sqltools-driver-mysql",
-        // REST testing
-        "humao.rest-client",
-        // Env files
-        "mikestead.dotenv",
-        // GitHub
-        "github.vscode-pull-request-github",
-        "github.copilot",
-        // Containers / Compose
-        "ms-vscode-remote.remote-containers"
-      ],
+      "extensions": ["esbenp.prettier-vscode", "mikestead.dotenv", "github.copilot", "GitHub.copilot-chat"],
       "settings": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter"
-        },
-        "[csharp]": {
-          "editor.defaultFormatter": "ms-dotnettools.csdevkit"
-        },
         "files.exclude": {
           "**/node_modules": true,
           "**/__pycache__": true,
